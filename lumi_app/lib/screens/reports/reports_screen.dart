@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../models/health_report_model.dart';
+import '../../widgets/reports/weight_chart_card.dart';
+import '../../widgets/reports/daily_stat_card.dart';
+import '../../widgets/reports/health_event_card.dart';
+import '../../widgets/shared/section_header.dart';
 
 class ReportsScreen extends StatelessWidget {
   const ReportsScreen({super.key});
@@ -9,64 +14,90 @@ class ReportsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final report = HealthReportModel.demo;
 
-    return Center(
+    return SingleChildScrollView(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: colors.blueLight,
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: FaIcon(
-                FontAwesomeIcons.notesMedical,
-                size: 40,
-                color: AppColors.primaryBlue,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            AppStrings.reportsScreenTitle,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              color: colors.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Tahlil sonuçları, kilo takibi\nve sağlık geçmişi',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              color: colors.textTertiary,
-              height: 1.5,
-            ),
-          ),
-          const SizedBox(height: 32),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 12,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primaryBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'Yakında...',
+          const SizedBox(height: 16),
+
+          // Page Title
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Text(
+              AppStrings.reportsScreenTitle,
               style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryBlue,
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: colors.textPrimary,
               ),
             ),
           ),
+
+          const SizedBox(height: 24),
+
+          // Section: Weight Tracking
+          const SectionHeader(title: AppStrings.weightTracking),
+
+          const SizedBox(height: 16),
+
+          // Weight Chart Card
+          WeightChartCard(
+            weightHistory: report.weightHistory,
+            currentWeight: report.currentWeight,
+            totalGain: report.totalWeightGain,
+          ),
+
+          const SizedBox(height: 28),
+
+          // Section: Daily Tracking
+          const SectionHeader(title: AppStrings.dailyTracking),
+
+          const SizedBox(height: 16),
+
+          // Daily Stats Row
+          DailyStatsRow(
+            cards: [
+              DailyStatCard(
+                icon: FontAwesomeIcons.glassWater,
+                label: AppStrings.waterIntake,
+                value: report.todayWaterGlasses.toString(),
+                unit: '/ ${report.waterGoal} ${AppStrings.glasses}',
+                subtitle: AppStrings.today,
+                iconBackgroundColor: colors.blueLight,
+                iconColor: AppColors.primaryBlue,
+                progress: report.todayWaterGlasses / report.waterGoal,
+              ),
+              DailyStatCard(
+                icon: FontAwesomeIcons.shoePrints,
+                label: AppStrings.kickCount,
+                value: report.todayKickCount.toString(),
+                unit: AppStrings.kicks,
+                subtitle: AppStrings.today,
+                iconBackgroundColor: colors.pinkLight,
+                iconColor: AppColors.primaryPink,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 28),
+
+          // Section: Health History
+          SectionHeader(
+            title: AppStrings.healthHistory,
+            actionText: AppStrings.viewAll,
+            onActionTap: () {
+              // Show all health events
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          // Health Events List
+          HealthEventsList(events: report.healthEvents),
+
+          const SizedBox(height: 30),
         ],
       ),
     );
