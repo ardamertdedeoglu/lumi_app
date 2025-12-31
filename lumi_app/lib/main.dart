@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/theme_provider.dart';
@@ -12,8 +13,11 @@ import 'screens/reports/reports_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'widgets/common/bottom_nav_bar.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Turkish locale for date formatting
+  await initializeDateFormatting('tr_TR', null);
   
   // Set initial system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
