@@ -74,12 +74,15 @@ class DailyStatCard extends StatelessWidget {
                         valueColor: AlwaysStoppedAnimation<Color>(iconColor),
                       ),
                       Center(
-                        child: Text(
-                          '${(progress! * 100).toInt()}%',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                            color: colors.textSecondary,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 6),
+                          child: Text(
+                            '${(progress! * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: colors.textSecondary,
+                            ),
                           ),
                         ),
                       ),
