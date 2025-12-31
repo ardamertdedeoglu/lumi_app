@@ -27,7 +27,7 @@ class WeightChartCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -81,7 +81,7 @@ class WeightChartCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryPink.withOpacity(0.1),
+                  color: AppColors.primaryPink.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -165,7 +165,7 @@ class _WeightChartPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final gridPaint = Paint()
-      ..color = (isDark ? Colors.white : Colors.black).withOpacity(0.05)
+      ..color = (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05)
       ..strokeWidth = 1;
 
     // Find min and max weights

@@ -49,7 +49,7 @@ class SettingsMenuItem extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
+                    color: iconColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
@@ -115,7 +115,7 @@ class SettingsMenuItem extends StatelessWidget {
         return Switch(
           value: toggleValue ?? false,
           onChanged: onToggleChanged,
-          activeColor: AppColors.primaryPink,
+          activeThumbColor: AppColors.primaryPink,
         );
       case SettingsItemType.info:
         return const SizedBox.shrink();
@@ -142,7 +142,7 @@ class SettingsMenuCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
