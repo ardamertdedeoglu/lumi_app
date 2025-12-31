@@ -60,7 +60,7 @@ class AppStrings {
   // ============ PROFILE SCREEN ============
   static const String profileScreenTitle = 'Profilim';
   static const String pregnancyInfo = 'Gebelik Bilgileri';
-  static const String lastPeriodDate = 'Son Adet Tarihi';
+  static const String lastPeriodDate = 'Son Regl Tarihi';
   static const String expectedDueDate = 'Tahmini Doğum';
   static const String doctor = 'Doktor';
   static const String settings = 'Ayarlar';

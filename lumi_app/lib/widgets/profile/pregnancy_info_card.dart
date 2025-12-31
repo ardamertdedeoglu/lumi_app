@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/constants/app_strings.dart';
 
 class PregnancyInfoItem {
   final IconData icon;
@@ -37,19 +38,19 @@ class PregnancyInfoCard extends StatelessWidget {
     final items = [
       PregnancyInfoItem(
         icon: FontAwesomeIcons.calendarDay,
-        label: 'Son Adet Tarihi',
+        label: AppStrings.lastPeriodDate,
         value: dateFormat.format(lastPeriodDate),
         iconColor: AppColors.primaryPink,
       ),
       PregnancyInfoItem(
         icon: FontAwesomeIcons.baby,
-        label: 'Tahmini Doğum',
+        label: AppStrings.expectedDueDate,
         value: dateFormat.format(expectedDueDate),
         iconColor: AppColors.primaryPurple,
       ),
       PregnancyInfoItem(
         icon: FontAwesomeIcons.userDoctor,
-        label: 'Doktor',
+        label: AppStrings.doctor,
         value: doctorName,
         iconColor: AppColors.primaryBlue,
       ),
