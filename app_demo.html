@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lumi - Uygulama Arayüzü Demo</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+
+      body {
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 40px;
+      }
+
+      /* --- IPHONE 14/15 PRO FRAME --- */
+      .iphone-mockup {
+        width: 390px; /* iPhone 14 boyutu civarı */
+        height: 800px;
+        background: #121212;
+        border-radius: 55px;
+        box-shadow: 0 0 0 12px #343434, /* Çerçeve dış gri */ 0 0 0 14px #1a1a1a,
+          /* Çerçeve dış siyah */ 40px 50px 100px -20px rgba(0, 0, 0, 0.5); /* Gölge */
+        position: relative;
+        overflow: hidden;
+        border: 8px solid #000;
+      }
+
+      /* Dynamic Island / Notch */
+      .island {
+        width: 120px;
+        height: 35px;
+        background: #000;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 20px;
+        z-index: 100;
+      }
+
+      /* Screen Content */
+      .screen {
+        width: 100%;
+        height: 100%;
+        background: #f8fafc;
+        overflow-y: auto;
+        position: relative;
+        padding-top: 60px; /* Notch payı */
+        padding-bottom: 90px; /* Bottom nav payı */
+      }
+
+      /* Scrollbar gizleme */
+      .screen::-webkit-scrollbar {
+        display: none;
+      }
+
+      /* --- APP UI STYLES --- */
+
+      /* Header */
+      .app-header {
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .user-info h2 {
+        font-size: 22px;
+        color: #1e293b;
+        font-weight: 700;
+      }
+
+      .user-info p {
+        color: #64748b;
+        font-size: 14px;
+      }
+
+      .profile-pic {
+        width: 45px;
+        height: 45px;
+        background: #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        position: relative;
+      }
+
+      .notification-dot {
+        width: 12px;
+        height: 12px;
+        background: #ef4444;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: 2px solid #f8fafc;
+      }
+
+        /* AI Card */
+        .ai-card {
+            margin: 0 20px 24px;
+            background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);
+            padding: 20px;
+            border-radius: 24px;
+            color: white;
+            box-shadow: 0 10px 30px -10px rgba(236, 72, 153, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+      .ai-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .ai-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        backdrop-filter: blur(5px);
+      }
+
+      .ai-message {
+        font-size: 15px;
+        line-height: 1.5;
+        opacity: 0.95;
+      }
+
+      /* Section Titles */
+      .section-header {
+        padding: 0 24px;
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+
+      .section-header h3 {
+        font-size: 18px;
+        color: #334155;
+        font-weight: 700;
+      }
+
+      .see-all {
+        font-size: 13px;
+        color: #0ea5e9;
+        font-weight: 600;
+      }
+
+      /* Status Cards Grid */
+      .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        padding: 0 20px 24px;
+      }
+
+      .status-card {
+        background: white;
+        padding: 16px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .card-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .card-value {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .card-label {
+        font-size: 13px;
+        color: #64748b;
+      }
+
+      /* Timeline / Tasks */
+      .timeline-container {
+        padding: 0 20px;
+      }
+
+      .task-card {
+        background: white;
+        padding: 16px;
+        border-radius: 20px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        border-left: 4px solid transparent;
+      }
+
+      .task-time {
+        font-weight: 600;
+        color: #334155;
+        font-size: 14px;
+        min-width: 45px;
+      }
+
+      .task-content {
+        flex: 1;
+      }
+
+      .task-title {
+        font-weight: 600;
+        color: #1e293b;
+        font-size: 15px;
+      }
+
+      .task-subtitle {
+        font-size: 13px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+
+      .task-check {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #cbd5e1;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .task-card.active {
+        border-left-color: #0ea5e9;
+      }
+
+      .task-card.urgent {
+        border-left-color: #f43f5e;
+      }
+
+      /* Quick Actions */
+      .actions-scroll {
+        display: flex;
+        gap: 15px;
+        padding: 0 20px 24px;
+        overflow-x: auto;
+        padding-bottom: 5px; /* Scrollbar payı */
+      }
+
+      .actions-scroll::-webkit-scrollbar {
+        height: 0;
+        width: 0;
+      }
+
+      .action-btn {
+        min-width: 100px;
+        height: 100px;
+        background: white;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+        border: 1px solid #f1f5f9;
+      }
+
+      .action-icon-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f0f9ff;
+        color: #0ea5e9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+
+      .action-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+      }
+
+      /* Bottom Navigation */
+      .bottom-nav {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 85px;
+        background: white;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding-bottom: 20px; /* Home indicator payı */
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+        z-index: 100;
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: #94a3b8;
+        font-size: 11px;
+        font-weight: 500;
+      }
+
+      .nav-item.active {
+        color: #0ea5e9;
+      }
+
+      .nav-item i {
+        font-size: 22px;
+        margin-bottom: 2px;
+      }
+
+      /* Home Indicator */
+      .home-indicator {
+        position: absolute;
+        bottom: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 130px;
+        height: 5px;
+        background: #1e293b;
+        border-radius: 3px;
+        z-index: 101;
+      }
+
+      /* Floating Action Button (Mikrofon/AI) - iphone-mockup'a göre sabitlendi */
+      .fab {
+        position: absolute;
+        bottom: 100px; /* Bottom nav üstünde */
+        right: 25px;
+        width: 56px;
+        height: 56px;
+        background: #0f172a;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+        z-index: 150; /* Bottom nav'ın üstünde */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="iphone-mockup">
+      <div class="island"></div>
+
+        <div class="screen">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="user-info">
+                    <p>Tekrar merhaba,</p>
+                    <h2>Zeynep Yılmaz 🤰</h2>
+                </div>
+                <div class="profile-pic">
+                    <i class="fa-regular fa-user"></i>
+                    <div class="notification-dot"></div>
+                </div>
+            </div>
+
+            <!-- AI Insight Card -->
+            <div class="ai-card">
+                <div class="ai-header">
+                    <i class="fa-solid fa-baby"></i>
+                    <span class="ai-badge">Bebek Gelişimi</span>
+                </div>
+                <p class="ai-message">
+                    "Tebrikler Zeynep! Bebeğin şu an bir avokado büyüklüğünde (11.6 cm). Kemik gelişimi için süt ürünlerini ihmal etme."
+                </p>
+            </div>
+
+            <!-- Progress / Status -->
+            <div class="section-header">
+                <h3>Gebelik Durumu</h3>
+                <span class="see-all">Takvim</span>
+            </div>
+
+            <div class="grid-container">
+                <div class="status-card">
+                    <div class="card-icon" style="background:#fdf2f8; color:#ec4899;">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <span class="card-value">16. Hafta</span>
+                    <span class="card-label">Gebelik Haftası</span>
+                </div>
+                <div class="status-card">
+                    <div class="card-icon" style="background:#f3e8ff; color:#a855f7;">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <span class="card-value">165 Gün</span>
+                    <span class="card-label">Doğuma Kalan</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="section-header">
+                <h3>Hızlı İşlemler</h3>
+            </div>
+            
+            <div class="actions-scroll">
+                <div class="action-btn">
+                    <div class="action-icon-circle" style="background: #ffe4e6; color: #f43f5e;">
+                        <i class="fa-solid fa-shoe-prints"></i>
+                    </div>
+                    <span class="action-text">Tekme</span>
+                </div>
+                <div class="action-btn">
+                    <div class="action-icon-circle" style="background: #dcfce7; color: #22c55e;">
+                        <i class="fa-solid fa-weight-scale"></i>
+                    </div>
+                    <span class="action-text">Kilo Ekle</span>
+                </div>
+                <div class="action-btn">
+                    <div class="action-icon-circle" style="background: #e0f2fe; color: #0ea5e9;">
+                        <i class="fa-solid fa-glass-water"></i>
+                    </div>
+                    <span class="action-text">Su Takibi</span>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="section-header" style="margin-top: 20px;">
+                <h3>Bugünün Planı</h3>
+            </div>
+
+            <div class="timeline-container">
+                <div class="task-card active" style="border-left-color: #ec4899;">
+                    <div class="task-time">09:00</div>
+                    <div class="task-content">
+                        <div class="task-title">Folik Asit & Demir</div>
+                        <div class="task-subtitle">Tok karnına • 1 Tablet</div>
+                    </div>
+                    <div class="task-check" style="background:#ec4899; border-color:#ec4899; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-check" style="color:white; font-size:12px;"></i>
+                    </div>
+                </div>
+
+                <div class="task-card urgent" style="border-left-color: #a855f7;">
+                    <div class="task-time">14:30</div>
+                    <div class="task-content">
+                        <div class="task-title">Doktor Kontrolü</div>
+                        <div class="task-subtitle">Dr. Ayşe Yılmaz ile Ultrason</div>
+                    </div>
+                    <div class="task-check"></div>
+                </div>
+
+                <div class="task-card">
+                    <div class="task-time">18:00</div>
+                    <div class="task-content">
+                        <div class="task-title">Hamile Yogası</div>
+                        <div class="task-subtitle">AI Önerisi: Sırt ağrıları için</div>
+                    </div>
+                    <div class="task-check"></div>
+                </div>
+                
+                <!-- Boşluk bırakmak için -->
+                <div style="height: 20px"></div>
+            </div>
+        </div>
+
+        <!-- Floating Button - Screen dışında, iphone-mockup içinde sabit -->
+        <div class="fab">
+            <i class="fa-solid fa-microphone"></i>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="bottom-nav">
+            <div class="nav-item active" style="color: #ec4899;">
+                <i class="fa-solid fa-house"></i>
+                <span>Ana Sayfa</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-baby"></i>
+                <span>Bebek</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-notes-medical"></i>
+                <span>Raporlar</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-regular fa-user"></i>
+                <span>Profil</span>
+            </div>
+            
+            <div class="home-indicator"></div>
+        </div>
+    </div>
+    
+  </body>
+</html>

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumi - Yapay Zeka Sağlık Asistanı</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+        /* --- TEMEL AYARLAR (RESET) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #ec4899; /* Canlı Pembe */
+            --secondary: #db2777;
+            --dark: #4a044e; /* Koyu Mor */
+            --light: #fdf2f8; /* Açık Pembe */
+            --white: #ffffff;
+            --gray: #64748b;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+
+        /* --- HEADER & NAV --- */
+        header {
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn-download:hover { background-color: var(--secondary); }
+
+        /* Mobil Menü İkonu (Default Gizli) */
+        .menu-toggle { display: none; font-size: 1.5rem; cursor: pointer; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: 8rem 5% 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .hero h1 span { color: var(--primary); }
+
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-store {
+            /* Resimler için özelleştirilmiş stil */
+            display: block;
+            background: transparent;
+            padding: 0;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            overflow: hidden; /* Resim taşmasın */
+        }
+        
+        .btn-store:hover { 
+            transform: translateY(-5px);
+            background: transparent;
+        }
+        
+        .btn-store img {
+            display: block;
+            height: 55px; /* Standart yükseklik */
+            width: auto;
+        }
+
+        /* CSS İLE TELEFON MOCKUP (Resim gerekmez) */
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 300px;
+            height: 600px;
+            background: var(--dark);
+            border-radius: 40px;
+            border: 10px solid var(--dark);
+            position: relative;
+            box-shadow: 20px 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            background-color: #F8FAFC; /* İçerik rengi */
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #F8FAFC;
+            position: relative;
+            padding: 20px;
+            padding-top: 40px; /* Notch payı */
+            overflow-y: hidden;
+        }
+
+        /* App Demo Benzeri Stil */
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .app-header h3 { font-size: 1.1rem; color: var(--dark); }
+        .app-header span { font-size: 1.2rem; }
+        
+        .ai-card {
+            background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+            padding: 15px;
+            border-radius: 15px;
+            color: white;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        }
+
+        .ai-header { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 0.9rem; font-weight: 600; opacity: 0.9; }
+        .ai-message { font-size: 0.85rem; line-height: 1.4; }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .status-box {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+        
+        .status-icon { font-size: 1.2rem; margin-bottom: 5px; display: block; }
+        .status-val { font-size: 1.1rem; font-weight: 700; color: var(--dark); display: block; }
+        .status-lbl { font-size: 0.7rem; color: var(--gray); }
+
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-item {
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-left: 3px solid transparent;
+        }
+        
+        .task-item.active { border-left-color: var(--primary); }
+        
+        .task-time { font-size: 0.8rem; font-weight: 600; color: var(--gray); min-width: 35px; }
+        .task-info h4 { font-size: 0.9rem; color: var(--dark); }
+        .task-info p { font-size: 0.7rem; color: var(--gray); }
+        .notch {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 120px; height: 25px;
+            background: var(--dark);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 2;
+        }
+
+        /* --- FEATURES SECTION --- */
+        .features {
+            background: var(--white);
+            padding: 5rem 5%;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            padding: 2rem;
+            border-radius: 20px;
+            background: var(--light);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover { transform: translateY(-5px); }
+
+        .icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--dark);
+            color: var(--white);
+            padding: 3rem 5%;
+            text-align: center;
+        }
+
+        /* --- RESPONSIVE TASARIM (MOBİL) --- */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+                padding-top: 6rem;
+            }
+
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { margin: 0 auto 2rem; }
+            
+            .cta-buttons {
+                justify-content: center;
+
+            }
+
+            .nav-links { display: none; } /* Basitlik için mobilde menüyü gizledim */
+            .menu-toggle { display: block; }
+            
+            .phone-mockup {
+                width: 260px;
+                height: 520px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <a href="#" class="logo">
+                🩺 Lumi
+            </a>
+            <div class="menu-toggle">☰</div>
+            <ul class="nav-links">
+                <li><a href="#ozellikler">Özellikler</a></li>
+                <li><a href="#nasil">Nasıl Çalışır?</a></li>
+                <li><a href="#iletisim">İletişim</a></li>
+                <li><a href="#" class="btn-download">Uygulamayı İndir</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Mutlu Bir Gebelik ve<br><span>Sağlıklı Bebek</span> İçin</h1>
+            <p>Anne adayları için hafta hafta gelişim takibi, AI destekli beslenme önerileri ve dijital sağlık asistanı. Doktorunuzla her an bağlantıda kalın.</p>
+            
+            <div class="cta-buttons">
+                <a href="#" class="btn-store">
+                    <img src="images/app_store.png" alt="App Store">
+                </a>
+                <a href="#" class="btn-store">
+                    <img src="images/google_play.png" alt="Google Play">
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <div class="phone-mockup">
+                <div class="notch"></div>
+                <div class="phone-screen">
+                    <div class="app-header">
+                        <h3>Merhaba, Zeynep 🤰</h3>
+                        <span>🔔</span>
+                    </div>
+                    
+                    <!-- AI Card -->
+                    <div class="ai-card" style="background: linear-gradient(135deg, #ec4899 0%, #a855f7 100%);">
+                        <div class="ai-header">
+                            <span>👶 Bebeğinizin Gelişimi</span>
+                        </div>
+                        <p class="ai-message">"Bebeğiniz şu an bir avokado büyüklüğünde! 🥑 Kalsiyum alımına dikkat etmeni öneriyorum."</p>
+                    </div>
+
+                    <!-- Status Grid -->
+                    <div class="status-grid">
+                        <div class="status-box">
+                            <span class="status-icon">📅</span>
+                            <span class="status-val">16. Hafta</span>
+                            <span class="status-lbl">Gebelik</span>
+                        </div>
+                        <div class="status-box">
+                            <span class="status-icon">⏳</span>
+                            <span class="status-val">165 Gün</span>
+                            <span class="status-lbl">Doğuma Kalan</span>
+                        </div>
+                    </div>
+
+                    <!-- Task List -->
+                    <div style="margin-bottom: 10px; font-size: 0.9rem; font-weight: 600; color: #334155;">Bugünün Planı</div>
+                    <div class="task-list">
+                        <div class="task-item active" style="border-left-color: #ec4899;">
+                            <div class="task-time">09:00</div>
+                            <div class="task-info">
+                                <h4>Folik Asit & Vitamin</h4>
+                                <p>Tok karnına • 1 Tablet</p>
+                            </div>
+                        </div>
+                        <div class="task-item" style="border-left-color: #a855f7;">
+                            <div class="task-time">14:30</div>
+                            <div class="task-info">
+                                <h4>Doktor Kontrolü</h4>
+                                <p>Dr. Ayşe Yılmaz ile</p>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <div class="task-time">18:00</div>
+                            <div class="task-info">
+                                <h4>Hamile Yogası</h4>
+                                <p>AI: 20 dk rahatlama</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Nav Temsili -->
+                    <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: white; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-around; align-items: center; font-size: 1.2rem; color: #cbd5e1;">
+                        <i class="fa-solid fa-house"></i>           
+                        <i class="fa-solid fa-baby"></i>
+                        <i class="fa-solid fa-notes-medical"></i>
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features" id="ozellikler">
+        <h2 class="section-title">Anne Adayları İçin Özellikler</h2>
+        <div class="feature-grid" style="margin-bottom: 4rem;">
+            <div class="feature-card">
+                <span class="icon">👶</span>
+                <h3>Haftalık Gelişim</h3>
+                <p>Bebeğinizin gelişimini hafta hafta takip edin, vücudunuzdaki değişimleri öğrenin ve sürece hazırlıklı olun.</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon">🥗</span>
+                <h3>Beslenme & Egzersiz</h3>
+                <p>Hamilelik haftanıza özel AI destekli beslenme programları ve güvenli egzersiz önerileri alın.</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon">🦶</span>
+                <h3>Tekme Sayacı</h3>
+                <p>Bebeğinizin hareketlerini kolayca kaydedin ve gelişimini doktorunuzla paylaşmak üzere raporlayın.</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon">⚖️</span>
+                <h3>Kilo Takibi</h3>
+                <p>Sağlıklı kilo alım sürecinizi grafikler üzerinden izleyin ve ideal aralıkta kalın.</p>
+            </div>
+        </div>
+
+        <h2 class="section-title">Doktorlar & Hastaneler İçin</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <span class="icon">🩺</span>
+                <h3>Uzaktan Takip</h3>
+                <p>Anne adayının tansiyon, kilo ve şeker verilerini uzaktan izleyin, riskli durumlarda anında haberdar olun.</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon">📊</span>
+                <h3>Gelişim Raporları</h3>
+                <p>Bebeğin ve annenin tüm gelişim verilerini tek bir ekranda görüntüleyerek süreci daha iyi yönetin.</p>
+            </div>
+            <div class="feature-card">
+                <span class="icon">💬</span>
+                <h3>Kolay İletişim</h3>
+                <p>Hastanızın sorularını uygulama üzerinden yanıtlayın ve randevu takibini dijitalleştirin.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Lumi Girişimi. Tüm hakları saklıdır.</p>
+        <p style="font-size: 0.8em; color: gray; margin-top: 10px;">Bu proje bir girişimcilik sunumu için hazırlanmıştır.</p>
+    </footer>
+
+    <script>
+        // Mobil Menü Basit İşlevsellik
+        const toggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        toggle.addEventListener('click', () => {
+            if(navLinks.style.display === 'flex'){
+                navLinks.style.display = 'none';
+            } else {
+                navLinks.style.display = 'flex';
+                navLinks.style.flexDirection = 'column';
+                navLinks.style.position = 'absolute';
+                navLinks.style.top = '70px';
+                navLinks.style.right = '0';
+                navLinks.style.background = 'white';
+                navLinks.style.width = '100%';
+                navLinks.style.padding = '20px';
+                navLinks.style.boxShadow = '0 5px 10px rgba(0,0,0,0.1)';
+            }
+        });
+    </script>
+</body>
+</html>
