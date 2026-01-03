@@ -46,6 +46,12 @@ dependencies:
   
   # Date formatting
   intl: ^0.19.0
+  
+  # HTTP requests
+  http: ^1.2.2
+  
+  # Local storage for auth tokens
+  shared_preferences: ^2.3.4
 
 dev_dependencies:
   flutter_test:

@@ -11,13 +11,18 @@ import 'screens/home/home_screen.dart';
 import 'screens/baby/baby_screen.dart';
 import 'screens/reports/reports_screen.dart';
 import 'screens/profile/profile_screen.dart';
+import 'screens/auth/login_screen.dart';
 import 'widgets/common/bottom_nav_bar.dart';
+import 'services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Turkish locale for date formatting
   await initializeDateFormatting('tr_TR', null);
+  
+  // Load auth tokens
+  await AuthService().loadTokens();
   
   // Set initial system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
@@ -37,8 +42,41 @@ void main() async {
   );
 }
 
-class LumiApp extends StatelessWidget {
+class LumiApp extends StatefulWidget {
   const LumiApp({super.key});
+
+  @override
+  State<LumiApp> createState() => _LumiAppState();
+}
+
+class _LumiAppState extends State<LumiApp> {
+  final AuthService _authService = AuthService();
+  bool _isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  void _checkLoginStatus() {
+    setState(() {
+      _isLoggedIn = _authService.isLoggedIn;
+    });
+  }
+
+  void _onLoginSuccess() {
+    setState(() {
+      _isLoggedIn = true;
+    });
+  }
+
+  void _onLogout() {
+    _authService.logout();
+    setState(() {
+      _isLoggedIn = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +88,12 @@ class LumiApp extends StatelessWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeProvider.themeMode,
-          home: const MainScreen(),
+          home: _isLoggedIn
+              ? const MainScreen()
+              : LoginScreen(
+                  onLoginSuccess: _onLoginSuccess,
+                  onSkipLogin: _onLoginSuccess, // Test için bypass
+                ),
         );
       },
     );
