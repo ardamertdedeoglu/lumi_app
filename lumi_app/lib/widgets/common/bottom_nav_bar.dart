@@ -6,11 +6,13 @@ import '../../core/constants/app_strings.dart';
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
+  final VoidCallback onFabTap;
 
   const BottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.onFabTap,
   });
 
   @override
@@ -47,6 +49,9 @@ class BottomNavBar extends StatelessWidget {
                 isActive: currentIndex == 1,
                 onTap: () => onTap(1),
               ),
+              _FabNavItem(
+                onTap: onFabTap,
+              ),
               _NavItem(
                 icon: FontAwesomeIcons.notesMedical,
                 label: AppStrings.navReports,
@@ -60,6 +65,43 @@ class BottomNavBar extends StatelessWidget {
                 onTap: () => onTap(3),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FabNavItem extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _FabNavItem({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.colors;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          color: colors.fabBackground,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: colors.fabBackground.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: FaIcon(
+            FontAwesomeIcons.microphone,
+            color: colors.fabForeground,
+            size: 20,
           ),
         ),
       ),

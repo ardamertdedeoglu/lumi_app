@@ -36,9 +36,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.lightCardWhite,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         margin: EdgeInsets.zero,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -68,8 +66,21 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.lightBorder,
+      dividerTheme: const DividerThemeData(color: AppColors.lightBorder),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.lightTextDark,
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.white,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        // FAB ve navbar ile hizalı olacak şekilde alt boşluk: 76 (navbar: 56 + 20 boşluk)
+        insetPadding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+        ),
       ),
     );
   }
@@ -105,9 +116,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.darkCardWhite,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         margin: EdgeInsets.zero,
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -137,8 +146,22 @@ class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.darkBorder,
+      dividerTheme: const DividerThemeData(color: AppColors.darkBorder),
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.darkTextDark,
+        contentTextStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.darkBackground,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        // FAB ve navbar ile hizalı olacak şekilde alt boşluk: 76 (navbar: 56 + 20 boşluk)
+        insetPadding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+          bottom: 76,
+        ),
       ),
     );
   }
@@ -146,9 +169,15 @@ class AppTheme {
   // Build text theme based on brightness
   static TextTheme _buildTextTheme({required bool isLight}) {
     final textDark = isLight ? AppColors.lightTextDark : AppColors.darkTextDark;
-    final textMedium = isLight ? AppColors.lightTextMedium : AppColors.darkTextMedium;
-    final textLight = isLight ? AppColors.lightTextLight : AppColors.darkTextLight;
-    final textMuted = isLight ? AppColors.lightTextMuted : AppColors.darkTextMuted;
+    final textMedium = isLight
+        ? AppColors.lightTextMedium
+        : AppColors.darkTextMedium;
+    final textLight = isLight
+        ? AppColors.lightTextLight
+        : AppColors.darkTextLight;
+    final textMuted = isLight
+        ? AppColors.lightTextMuted
+        : AppColors.darkTextMuted;
 
     return GoogleFonts.interTextTheme().copyWith(
       headlineLarge: GoogleFonts.inter(

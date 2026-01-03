@@ -170,21 +170,10 @@ class _MainScreenState extends State<MainScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAIAssistant(context);
-        },
-        backgroundColor: colors.fabBackground,
-        elevation: 10,
-        child: FaIcon(
-          FontAwesomeIcons.microphone,
-          color: colors.fabForeground,
-          size: 24,
-        ),
-      ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,
         onTap: _onNavTap,
+        onFabTap: () => _showAIAssistant(context),
       ),
     );
   }
