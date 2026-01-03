@@ -3,11 +3,19 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  // Backend URL - Docker'da çalışıyorsa localhost yerine IP adresini kullan
+  // Backend URL - Duruma göre ayarlayın:
   // Android emulator için: 10.0.2.2
-  // iOS simulator için: localhost
-  // Gerçek cihaz için: bilgisayarın IP adresi
+  // iOS simulator için: localhost  
+  // Windows'ta Chrome/Edge için: localhost
+  // Gerçek cihaz için: Bilgisayarın yerel IP'si (örn: 192.168.1.x)
+  // 
+  // IP adresinizi bulmak için: Windows'ta cmd'de "ipconfig" yazın
+  // "IPv4 Address" satırındaki adresi kullanın
   static const String baseUrl = 'http://10.0.2.2:80/api';
+  
+  // Alternatif URL'ler (test için):
+  // static const String baseUrl = 'http://localhost:80/api';  // Web/Windows için
+  // static const String baseUrl = 'http://192.168.1.X:80/api'; // Gerçek cihaz için
   
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
@@ -122,6 +130,16 @@ class AuthService {
           'password2': password,
         }),
       );
+
+      // HTML yanıtı kontrolü (sunucu hatası)
+      if (response.body.trim().startsWith('<!DOCTYPE') || 
+          response.body.trim().startsWith('<html') ||
+          response.body.trim().startsWith('<HTML')) {
+        return AuthResult(
+          success: false, 
+          message: 'Sunucu hatası (${response.statusCode}). Backend çalışıyor mu kontrol edin.',
+        );
+      }
 
       final data = jsonDecode(response.body);
 
