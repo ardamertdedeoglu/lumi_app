@@ -93,96 +93,110 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout() async {
-    final colors = context.colors;
+    // Dialog göstermeden önce onLogout callback'ini kaydet
+    final onLogoutCallback = widget.onLogout;
 
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: colors.card,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: AppColors.red.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: FaIcon(
-                  FontAwesomeIcons.rightFromBracket,
-                  size: 18,
-                  color: AppColors.red,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        // Dialog'un kendi context'inden theme al
+        final isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        final cardColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
+        final textPrimary = isDark ? Colors.white : const Color(0xFF1A1A2E);
+        final textSecondary = isDark
+            ? const Color(0xFFB0B0C0)
+            : const Color(0xFF4A4A5A);
+        final textTertiary = isDark
+            ? const Color(0xFF808090)
+            : const Color(0xFF6A6A7A);
+
+        return AlertDialog(
+          backgroundColor: cardColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.rightFromBracket,
+                    size: 18,
+                    color: AppColors.red,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              'Çıkış Yap',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: colors.textPrimary,
+              const SizedBox(width: 12),
+              Text(
+                'Çıkış Yap',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: textPrimary,
+                ),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Tekrar giriş yapmanız gerekecek.',
-          style: TextStyle(
-            fontSize: 14,
-            color: colors.textSecondary,
-            height: 1.5,
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            ),
-            child: Text(
-              'İptal',
-              style: TextStyle(
-                color: colors.textTertiary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          content: Text(
+            'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Tekrar giriş yapmanız gerekecek.',
+            style: TextStyle(fontSize: 14, color: textSecondary, height: 1.5),
           ),
-          Container(
-            decoration: BoxDecoration(
-              color: AppColors.red,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: TextButton(
-              onPressed: () => Navigator.pop(context, true),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 20,
                   vertical: 12,
                 ),
               ),
-              child: const Text(
-                'Çıkış Yap',
+              child: Text(
+                'İptal',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  color: textTertiary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
-          ),
-        ],
-      ),
+            Container(
+              decoration: BoxDecoration(
+                color: AppColors.red,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+                child: const Text(
+                  'Çıkış Yap',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
 
-    if (confirmed == true) {
-      // Çıkış yap ve giriş ekranına yönlendir
+    if (confirmed == true && onLogoutCallback != null) {
+      // Önce auth service'den çıkış yap
       await _authService.logout();
-
-      if (widget.onLogout != null) {
-        widget.onLogout!();
-      }
+      // Sonra callback'i çağır - bu noktada context kullanmıyoruz
+      onLogoutCallback();
     }
   }
 

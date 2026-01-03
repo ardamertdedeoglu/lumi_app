@@ -36,6 +36,7 @@ class DevelopmentInfoCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 36,
@@ -44,30 +45,27 @@ class DevelopmentInfoCard extends StatelessWidget {
               color: iconBackgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Center(
-              child: Icon(
-                icon,
-                size: 18,
-                color: iconColor,
-              ),
-            ),
+            child: Center(child: Icon(icon, size: 18, color: iconColor)),
           ),
           const SizedBox(height: 12),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: colors.textPrimary,
+          Flexible(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: colors.textPrimary,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 13,
-              color: colors.textTertiary,
-            ),
+            style: TextStyle(fontSize: 13, color: colors.textTertiary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -78,10 +76,7 @@ class DevelopmentInfoCard extends StatelessWidget {
 class DevelopmentInfoGrid extends StatelessWidget {
   final List<DevelopmentInfoCard> cards;
 
-  const DevelopmentInfoGrid({
-    super.key,
-    required this.cards,
-  });
+  const DevelopmentInfoGrid({super.key, required this.cards});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +88,7 @@ class DevelopmentInfoGrid extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         crossAxisSpacing: 15,
         mainAxisSpacing: 15,
-        childAspectRatio: 1.3,
+        childAspectRatio: 1.15, // Daha fazla dikey alan için düşürüldü
         children: cards,
       ),
     );
