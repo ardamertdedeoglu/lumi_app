@@ -15,16 +15,20 @@ import 'screens/profile/profile_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'widgets/common/bottom_nav_bar.dart';
 import 'services/auth_service.dart';
+import 'services/app_state.dart';
+
+/// Global navigator key for navigation from anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Turkish locale for date formatting
   await initializeDateFormatting('tr_TR', null);
-  
+
   // Load auth tokens
   await AuthService().loadTokens();
-  
+
   // Set initial system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -34,7 +38,7 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -46,12 +50,19 @@ void main() async {
 class LumiApp extends StatefulWidget {
   const LumiApp({super.key});
 
+  /// Global logout function - can be called from anywhere
+  static void logout(BuildContext context) {
+    final state = context.findAncestorStateOfType<_LumiAppState>();
+    state?._onLogout();
+  }
+
   @override
   State<LumiApp> createState() => _LumiAppState();
 }
 
 class _LumiAppState extends State<LumiApp> {
   final AuthService _authService = AuthService();
+  final AppState _appState = AppState();
   bool _isLoggedIn = false;
 
   @override
@@ -70,10 +81,13 @@ class _LumiAppState extends State<LumiApp> {
     setState(() {
       _isLoggedIn = true;
     });
+    // Profil verilerini yükle
+    _appState.loadProfile();
   }
 
   void _onLogout() {
     _authService.logout();
+    _appState.clear();
     setState(() {
       _isLoggedIn = false;
     });
@@ -84,6 +98,7 @@ class _LumiAppState extends State<LumiApp> {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: AppStrings.appName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
@@ -91,17 +106,14 @@ class _LumiAppState extends State<LumiApp> {
           themeMode: themeProvider.themeMode,
           // Türkçe yerelleştirme desteği
           locale: const Locale('tr', 'TR'),
-          supportedLocales: const [
-            Locale('tr', 'TR'),
-            Locale('en', 'US'),
-          ],
+          supportedLocales: const [Locale('tr', 'TR'), Locale('en', 'US')],
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
           home: _isLoggedIn
-              ? const MainScreen()
+              ? MainScreen(onLogout: _onLogout)
               : LoginScreen(
                   onLoginSuccess: _onLoginSuccess,
                   onSkipLogin: _onLoginSuccess, // Test için bypass
@@ -113,7 +125,9 @@ class _LumiAppState extends State<LumiApp> {
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final VoidCallback onLogout;
+
+  const MainScreen({super.key, required this.onLogout});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -121,13 +135,19 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-  
-  final List<Widget> _screens = const [
-    HomeScreen(),
-    BabyScreen(),
-    ReportsScreen(),
-    ProfileScreen(),
-  ];
+
+  late List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+    _screens = [
+      const HomeScreen(),
+      const BabyScreen(),
+      const ReportsScreen(),
+      ProfileScreen(onLogout: widget.onLogout),
+    ];
+  }
 
   void _onNavTap(int index) {
     setState(() {
@@ -138,16 +158,12 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: colors.background,
       body: SafeArea(
         bottom: false,
-        child: IndexedStack(
-          index: _currentIndex,
-          children: _screens,
-        ),
+        child: IndexedStack(index: _currentIndex, children: _screens),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -169,22 +185,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _showAIAssistant(BuildContext context) {
-    final colors = context.colors;
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) {
         final bottomSheetColors = context.colors;
-        
+
         return Container(
           height: MediaQuery.of(context).size.height * 0.5,
           decoration: BoxDecoration(
             color: bottomSheetColors.card,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [

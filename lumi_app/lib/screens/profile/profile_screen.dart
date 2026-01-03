@@ -13,7 +13,9 @@ import 'edit_profile_screen.dart';
 import 'edit_pregnancy_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final VoidCallback? onLogout;
+
+  const ProfileScreen({super.key, this.onLogout});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -22,7 +24,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileService _profileService = ProfileService();
   final AuthService _authService = AuthService();
-  
+
   bool _isLoading = true;
   bool _notificationsEnabled = true;
   FullProfile? _fullProfile;
@@ -57,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _toggleNotifications(bool value) async {
     setState(() => _notificationsEnabled = value);
-    
+
     final result = await _profileService.updateProfile(
       notificationsEnabled: value,
     );
@@ -74,34 +76,83 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout() async {
+    final colors = context.colors;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: context.colors.card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        title: Text(
-          'Çıkış Yap',
-          style: TextStyle(color: context.colors.textPrimary),
+        backgroundColor: colors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.red.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: FaIcon(
+                  FontAwesomeIcons.rightFromBracket,
+                  size: 18,
+                  color: AppColors.red,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Çıkış Yap',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: colors.textPrimary,
+              ),
+            ),
+          ],
         ),
         content: Text(
-          'Çıkış yapmak istediğinize emin misiniz?',
-          style: TextStyle(color: context.colors.textSecondary),
+          'Hesabınızdan çıkış yapmak istediğinize emin misiniz? Tekrar giriş yapmanız gerekecek.',
+          style: TextStyle(
+            fontSize: 14,
+            color: colors.textSecondary,
+            height: 1.5,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
+            style: TextButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
             child: Text(
               'İptal',
-              style: TextStyle(color: context.colors.textTertiary),
+              style: TextStyle(
+                color: colors.textTertiary,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Çıkış Yap',
-              style: TextStyle(color: AppColors.red),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.red,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: const Text(
+                'Çıkış Yap',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -109,15 +160,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     if (confirmed == true) {
+      // Çıkış yap ve giriş ekranına yönlendir
       await _authService.logout();
-      // Ana ekrana dönüş için uygulama yeniden başlatılmalı
-      // Bu işlem main.dart'taki state ile yönetilecek
+
+      if (widget.onLogout != null) {
+        widget.onLogout!();
+      }
     }
   }
 
   void _editProfile() {
     if (_fullProfile == null) return;
-    
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -151,9 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
-              color: AppColors.primaryPink,
-            ),
+            const CircularProgressIndicator(color: AppColors.primaryPink),
             const SizedBox(height: 16),
             Text(
               'Profil yükleniyor...',
@@ -324,10 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Center(
               child: Text(
                 '${AppStrings.version} 1.0.0',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: colors.textMuted,
-                ),
+                style: TextStyle(fontSize: 13, color: colors.textMuted),
               ),
             ),
 
@@ -338,7 +387,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildProfileHeader(BuildContext context, UserProfileData profile, PregnancyData? pregnancy) {
+  Widget _buildProfileHeader(
+    BuildContext context,
+    UserProfileData profile,
+    PregnancyData? pregnancy,
+  ) {
     final colors = context.colors;
 
     return Container(
@@ -424,10 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               child: Text(
                 'Hamilelik bilgisi girilmedi',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colors.textTertiary,
-                ),
+                style: TextStyle(fontSize: 14, color: colors.textTertiary),
               ),
             ),
           const SizedBox(height: 16),
@@ -449,7 +499,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildPregnancyInfoCard(BuildContext context, PregnancyData pregnancy, DateFormat dateFormat) {
+  Widget _buildPregnancyInfoCard(
+    BuildContext context,
+    PregnancyData pregnancy,
+    DateFormat dateFormat,
+  ) {
     final colors = context.colors;
 
     return Container(
@@ -482,7 +536,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             value: dateFormat.format(pregnancy.expectedDueDate),
             iconColor: AppColors.primaryPurple,
           ),
-          if (pregnancy.doctorName != null && pregnancy.doctorName!.isNotEmpty) ...[
+          if (pregnancy.doctorName != null &&
+              pregnancy.doctorName!.isNotEmpty) ...[
             Divider(color: colors.border, height: 1, indent: 70),
             _buildPregnancyInfoItem(
               context,
@@ -536,9 +591,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: iconColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: FaIcon(icon, size: 16, color: iconColor),
-            ),
+            child: Center(child: FaIcon(icon, size: 16, color: iconColor)),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -547,10 +600,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.textTertiary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textTertiary),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -614,10 +664,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(
             'Hamilelik takibinizi başlatmak için bilgilerinizi girin',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textTertiary,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.textTertiary),
           ),
           const SizedBox(height: 20),
           Container(
@@ -629,7 +676,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: ElevatedButton.icon(
               onPressed: _editPregnancy,
-              icon: const FaIcon(FontAwesomeIcons.plus, size: 16, color: Colors.white),
+              icon: const FaIcon(
+                FontAwesomeIcons.plus,
+                size: 16,
+                color: Colors.white,
+              ),
               label: const Text(
                 'Hamilelik Bilgisi Ekle',
                 style: TextStyle(
@@ -658,9 +709,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: colors.card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(
           children: [
             Container(
@@ -704,10 +753,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
             Text(
               '${AppStrings.version} 1.0.0',
-              style: TextStyle(
-                fontSize: 13,
-                color: colors.textMuted,
-              ),
+              style: TextStyle(fontSize: 13, color: colors.textMuted),
             ),
           ],
         ),
