@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../models/baby_development_model.dart';
@@ -10,186 +11,168 @@ import '../../widgets/baby/milestone_item.dart';
 import '../../widgets/baby/tips_card.dart';
 import '../../widgets/shared/section_header.dart';
 
-class BabyScreen extends StatefulWidget {
+class BabyScreen extends StatelessWidget {
   const BabyScreen({super.key});
-
-  @override
-  State<BabyScreen> createState() => _BabyScreenState();
-}
-
-class _BabyScreenState extends State<BabyScreen> {
-  final AppState _appState = AppState();
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    if (!_appState.hasData) {
-      await _appState.loadProfile();
-    }
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    if (_isLoading) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(color: AppColors.primaryPink),
-            const SizedBox(height: 16),
-            Text(
-              'Bebek bilgileri yükleniyor...',
-              style: TextStyle(color: colors.textTertiary),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final pregnancy = _appState.pregnancy;
-
-    // Eğer hamilelik bilgisi yoksa bilgilendirme göster
-    if (pregnancy == null) {
-      return _buildNoPregnancyState(context);
-    }
-
-    // Hamilelik haftasına göre bebek gelişim verisini al
-    final currentWeek = pregnancy.currentWeek;
-    final development = BabyDevelopmentModel.getForWeek(currentWeek);
-
-    return RefreshIndicator(
-      onRefresh: _loadData,
-      color: AppColors.primaryPink,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-
-            // Page Title
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                children: [
-                  Text(
-                    AppStrings.yourBabyThisWeek,
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '$currentWeek. Hafta',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Baby Size Card
-            BabySizeCard(development: development),
-
-            const SizedBox(height: 28),
-
-            // Section: Physical Development
-            const SectionHeader(title: AppStrings.physicalDevelopment),
-
-            const SizedBox(height: 16),
-
-            // Development Info Grid
-            DevelopmentInfoGrid(
-              cards: [
-                DevelopmentInfoCard(
-                  icon: FontAwesomeIcons.rulerVertical,
-                  label: AppStrings.length,
-                  value: development.length,
-                  iconBackgroundColor: colors.purpleLight,
-                  iconColor: AppColors.primaryPurple,
-                ),
-                DevelopmentInfoCard(
-                  icon: FontAwesomeIcons.weightScale,
-                  label: AppStrings.weight,
-                  value: development.weight,
-                  iconBackgroundColor: colors.pinkLight,
-                  iconColor: AppColors.primaryPink,
-                ),
-                DevelopmentInfoCard(
-                  icon: FontAwesomeIcons.heartPulse,
-                  label: AppStrings.heartRate,
-                  value: development.heartRate,
-                  iconBackgroundColor: colors.redLight,
-                  iconColor: AppColors.red,
-                ),
-                DevelopmentInfoCard(
-                  icon: FontAwesomeIcons.personRunning,
-                  label: AppStrings.movements,
-                  value: development.movements,
-                  iconBackgroundColor: colors.blueLight,
-                  iconColor: AppColors.primaryBlue,
+    return Consumer<AppState>(
+      builder: (context, appState, child) {
+        // Yükleniyor durumu - sadece ilk yüklemede göster
+        if (appState.isLoading && !appState.isInitialized) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(color: AppColors.primaryPink),
+                const SizedBox(height: 16),
+                Text(
+                  'Bebek bilgileri yükleniyor...',
+                  style: TextStyle(color: colors.textTertiary),
                 ),
               ],
             ),
+          );
+        }
 
-            const SizedBox(height: 28),
+        final pregnancy = appState.pregnancy;
 
-            // Section: This Week's Milestones
-            const SectionHeader(title: AppStrings.thisWeekMilestones),
+        // Eğer hamilelik bilgisi yoksa bilgilendirme göster
+        if (pregnancy == null) {
+          return _buildNoPregnancyState(context);
+        }
 
-            const SizedBox(height: 16),
+        // Hamilelik haftasına göre bebek gelişim verisini al
+        final currentWeek = pregnancy.currentWeek;
+        final development = BabyDevelopmentModel.getForWeek(currentWeek);
 
-            // Milestones List
-            MilestonesList(milestones: development.milestones),
+        return RefreshIndicator(
+          onRefresh: () => appState.refreshProfile(),
+          color: AppColors.primaryPink,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
 
-            const SizedBox(height: 28),
+                // Page Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppStrings.yourBabyThisWeek,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            color: colors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '$currentWeek. Hafta',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-            // Section: Tips for Mom
-            const SectionHeader(title: AppStrings.tipsForMom),
+                const SizedBox(height: 24),
 
-            const SizedBox(height: 16),
+                // Baby Size Card
+                BabySizeCard(development: development),
 
-            // Tips Card
-            TipsCard(tips: development.tips),
+                const SizedBox(height: 28),
 
-            const SizedBox(height: 28),
+                // Section: Physical Development
+                const SectionHeader(title: AppStrings.physicalDevelopment),
 
-            // Progress Indicator
-            _buildPregnancyProgress(context, currentWeek),
+                const SizedBox(height: 16),
 
-            const SizedBox(height: 30),
-          ],
-        ),
-      ),
+                // Development Info Grid
+                DevelopmentInfoGrid(
+                  cards: [
+                    DevelopmentInfoCard(
+                      icon: FontAwesomeIcons.rulerVertical,
+                      label: AppStrings.length,
+                      value: development.length,
+                      iconBackgroundColor: colors.purpleLight,
+                      iconColor: AppColors.primaryPurple,
+                    ),
+                    DevelopmentInfoCard(
+                      icon: FontAwesomeIcons.weightScale,
+                      label: AppStrings.weight,
+                      value: development.weight,
+                      iconBackgroundColor: colors.pinkLight,
+                      iconColor: AppColors.primaryPink,
+                    ),
+                    DevelopmentInfoCard(
+                      icon: FontAwesomeIcons.heartPulse,
+                      label: AppStrings.heartRate,
+                      value: development.heartRate,
+                      iconBackgroundColor: colors.redLight,
+                      iconColor: AppColors.red,
+                    ),
+                    DevelopmentInfoCard(
+                      icon: FontAwesomeIcons.personRunning,
+                      label: AppStrings.movements,
+                      value: development.movements,
+                      iconBackgroundColor: colors.blueLight,
+                      iconColor: AppColors.primaryBlue,
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 28),
+
+                // Section: This Week's Milestones
+                const SectionHeader(title: AppStrings.thisWeekMilestones),
+
+                const SizedBox(height: 16),
+
+                // Milestones List
+                MilestonesList(milestones: development.milestones),
+
+                const SizedBox(height: 28),
+
+                // Section: Tips for Mom
+                const SectionHeader(title: AppStrings.tipsForMom),
+
+                const SizedBox(height: 16),
+
+                // Tips Card
+                TipsCard(tips: development.tips),
+
+                const SizedBox(height: 28),
+
+                // Progress Indicator
+                _buildPregnancyProgress(context, currentWeek),
+
+                const SizedBox(height: 30),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -246,8 +229,20 @@ class _BabyScreenState extends State<BabyScreen> {
               ),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Profil sayfasına yönlendir
-                  // Bu Navigator ile yapılacak main.dart güncellenince
+                  // Profil sayfasına yönlendir - bu main.dart'tan nav index ile yapılacak
+                  // Şimdilik kullanıcıya bilgi ver
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Profil sekmesinden hamilelik bilgilerinizi girebilirsiniz',
+                      ),
+                      backgroundColor: colors.textPrimary,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
                 },
                 icon: const FaIcon(
                   FontAwesomeIcons.arrowRight,
@@ -353,7 +348,7 @@ class _BabyScreenState extends State<BabyScreen> {
               ),
               Text(
                 '%${(progress * 100).toInt()} tamamlandı',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryPink,

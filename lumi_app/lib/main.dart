@@ -40,8 +40,11 @@ void main() async {
   );
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AppState()),
+      ],
       child: const LumiApp(),
     ),
   );
@@ -50,19 +53,12 @@ void main() async {
 class LumiApp extends StatefulWidget {
   const LumiApp({super.key});
 
-  /// Global logout function - can be called from anywhere
-  static void logout(BuildContext context) {
-    final state = context.findAncestorStateOfType<_LumiAppState>();
-    state?._onLogout();
-  }
-
   @override
   State<LumiApp> createState() => _LumiAppState();
 }
 
 class _LumiAppState extends State<LumiApp> {
   final AuthService _authService = AuthService();
-  final AppState _appState = AppState();
   bool _isLoggedIn = false;
 
   @override
@@ -81,13 +77,15 @@ class _LumiAppState extends State<LumiApp> {
     setState(() {
       _isLoggedIn = true;
     });
-    // Profil verilerini yükle
-    _appState.loadProfile();
+    // AppState'i initialize et ve profil verilerini yükle
+    final appState = Provider.of<AppState>(context, listen: false);
+    appState.initialize();
   }
 
   void _onLogout() {
+    final appState = Provider.of<AppState>(context, listen: false);
     _authService.logout();
-    _appState.clear();
+    appState.clear();
     setState(() {
       _isLoggedIn = false;
     });
@@ -136,17 +134,16 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  late List<Widget> _screens;
-
   @override
   void initState() {
     super.initState();
-    _screens = [
-      const HomeScreen(),
-      const BabyScreen(),
-      const ReportsScreen(),
-      ProfileScreen(onLogout: widget.onLogout),
-    ];
+    // Ekran yüklendiğinde AppState'i initialize et
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      if (!appState.isInitialized) {
+        appState.initialize();
+      }
+    });
   }
 
   void _onNavTap(int index) {
@@ -163,7 +160,15 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: colors.background,
       body: SafeArea(
         bottom: false,
-        child: IndexedStack(index: _currentIndex, children: _screens),
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            const HomeScreen(),
+            const BabyScreen(),
+            const ReportsScreen(),
+            ProfileScreen(onLogout: widget.onLogout),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

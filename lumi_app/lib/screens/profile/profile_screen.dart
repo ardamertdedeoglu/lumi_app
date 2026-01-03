@@ -7,6 +7,7 @@ import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_strings.dart';
 import '../../services/profile_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/app_state.dart';
 import '../../widgets/profile/settings_menu_item.dart';
 import '../../widgets/shared/section_header.dart';
 import 'edit_profile_screen.dart';
@@ -50,10 +51,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (result.isSuccess && result.data != null) {
           _fullProfile = result.data;
           _notificationsEnabled = result.data!.profile.notificationsEnabled;
+
+          // AppState'i de güncelle - diğer ekranlar da güncellensin
+          final appState = Provider.of<AppState>(context, listen: false);
+          appState.updateProfile(result.data!.profile);
+          if (result.data!.pregnancy != null) {
+            appState.updatePregnancy(result.data!.pregnancy);
+          }
         } else {
           _errorMessage = result.errorMessage;
         }
       });
+    }
+  }
+
+  /// Profil ve AppState'i birlikte yenile
+  Future<void> _refreshAll() async {
+    await _loadProfile();
+    if (mounted) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      await appState.refreshProfile();
     }
   }
 
@@ -177,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(
         builder: (context) => EditProfileScreen(
           profile: _fullProfile!.profile,
-          onSaved: _loadProfile,
+          onSaved: _refreshAll,
         ),
       ),
     );
@@ -189,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       MaterialPageRoute(
         builder: (context) => EditPregnancyScreen(
           pregnancy: _fullProfile?.pregnancy,
-          onSaved: _loadProfile,
+          onSaved: _refreshAll,
         ),
       ),
     );
@@ -258,7 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final dateFormat = DateFormat('dd MMMM yyyy', 'tr_TR');
 
     return RefreshIndicator(
-      onRefresh: _loadProfile,
+      onRefresh: _refreshAll,
       color: AppColors.primaryPink,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
