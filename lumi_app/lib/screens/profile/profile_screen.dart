@@ -273,9 +273,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryPink,
                   foregroundColor: Colors.white,
+                  minimumSize: const Size(200, 45),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: _logout,
+                icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 16),
+                label: const Text('Çıkış Yap'),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.red,
+                  minimumSize: const Size(200, 45),
                 ),
               ),
             ],
