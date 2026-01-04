@@ -11,7 +11,7 @@ class AuthService {
   // 
   // IP adresinizi bulmak için: Windows'ta cmd'de "ipconfig" yazın
   // "IPv4 Address" satırındaki adresi kullanın
-  static const String baseUrl = 'http://10.233.98.178:80/api';
+  static const String baseUrl = 'https://lumiappbackend-production.up.railway.app/api';
   
   // Alternatif URL'ler (test için):
   // static const String baseUrl = 'http://localhost:80/api';  // Web/Windows için
