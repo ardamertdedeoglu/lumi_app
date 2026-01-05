@@ -168,6 +168,46 @@ class ProfileService {
       return ProfileResult.error('Bağlantı hatası: $e');
     }
   }
+
+  /// Aile eşleşme kodu oluştur
+  Future<ProfileResult<String>> generateFamilyCode() async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/family/generate-code/'),
+        headers: _headers,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return ProfileResult.success(data['code']);
+      } else {
+        final data = jsonDecode(response.body);
+        return ProfileResult.error(data['detail'] ?? 'Kod oluşturulamadı');
+      }
+    } catch (e) {
+      return ProfileResult.error('Bağlantı hatası: $e');
+    }
+  }
+
+  /// Partner ile eşleş
+  Future<ProfileResult<void>> linkPartner(String code) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/family/link-partner/'),
+        headers: _headers,
+        body: jsonEncode({'code': code}),
+      );
+
+      if (response.statusCode == 200) {
+        return ProfileResult.success(null);
+      } else {
+        final data = jsonDecode(response.body);
+        return ProfileResult.error(data['detail'] ?? 'Eşleşme başarısız');
+      }
+    } catch (e) {
+      return ProfileResult.error('Bağlantı hatası: $e');
+    }
+  }
 }
 
 /// Profil işlem sonucu
@@ -206,11 +246,14 @@ class UserProfileData {
   final String firstName;
   final String lastName;
   final String fullName;
+  final String role;
   final String? phone;
   final DateTime? birthDate;
   final String? profileImage;
   final bool notificationsEnabled;
   final bool hasPregnancy;
+  final bool hasPartner;
+  final Map<String, dynamic>? partnerInfo;
 
   UserProfileData({
     required this.id,
@@ -218,11 +261,14 @@ class UserProfileData {
     required this.firstName,
     required this.lastName,
     required this.fullName,
+    required this.role,
     this.phone,
     this.birthDate,
     this.profileImage,
     required this.notificationsEnabled,
     required this.hasPregnancy,
+    this.hasPartner = false,
+    this.partnerInfo,
   });
 
   factory UserProfileData.fromJson(Map<String, dynamic> json) {
@@ -232,6 +278,7 @@ class UserProfileData {
       firstName: json['first_name'],
       lastName: json['last_name'],
       fullName: json['full_name'],
+      role: json['role'] ?? 'mother',
       phone: json['phone'],
       birthDate: json['birth_date'] != null 
           ? DateTime.parse(json['birth_date']) 
@@ -239,8 +286,13 @@ class UserProfileData {
       profileImage: json['profile_image'],
       notificationsEnabled: json['notifications_enabled'] ?? true,
       hasPregnancy: json['has_pregnancy'] ?? false,
+      hasPartner: json['has_partner'] ?? false,
+      partnerInfo: json['partner_info'],
     );
   }
+
+  bool get isMother => role == 'mother';
+  bool get isFather => role == 'father';
 }
 
 /// Hamilelik verisi

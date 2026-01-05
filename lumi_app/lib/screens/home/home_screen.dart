@@ -47,7 +47,9 @@ class HomeScreen extends StatelessWidget {
         final daysLabel = pregnancy?.daysLabel ?? '-';
         final aiMessage = pregnancy != null
             ? 'Bebeğiniz şu anda ${pregnancy.babySize} büyüklüğünde. ${pregnancy.babySizeDescription}'
-            : 'Hamilelik bilgilerinizi profilinizden ekleyerek bebeğinizin gelişimini takip edebilirsiniz.';
+            : (appState.profile?.isFather == true 
+                ? 'Partnerinizle eşleşerek bebeğinizin gelişimini buradan takip edebilirsiniz.'
+                : 'Hamilelik bilgilerinizi profilinizden ekleyerek bebeğinizin gelişimini takip edebilirsiniz.');
 
         return RefreshIndicator(
           onRefresh: () => appState.refreshProfile(),
@@ -60,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 // Header with Theme Toggle
-                _buildHeader(context, userName, themeProvider),
+                _buildHeader(context, userName, themeProvider, appState.profile?.isFather ?? false),
 
                 const SizedBox(height: 24),
 
@@ -164,6 +166,7 @@ class HomeScreen extends StatelessWidget {
     BuildContext context,
     String userName,
     ThemeProvider themeProvider,
+    bool isFather,
   ) {
     final colors = context.colors;
 
@@ -192,7 +195,10 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Text('🤰', style: TextStyle(fontSize: 20)),
+                  Text(
+                    isFather ? '👨‍💼' : '🤰',
+                    style: const TextStyle(fontSize: 20),
+                  ),
                 ],
               ),
             ],

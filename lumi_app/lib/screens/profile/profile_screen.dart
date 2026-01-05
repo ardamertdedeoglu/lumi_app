@@ -31,6 +31,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   FullProfile? _fullProfile;
   String? _errorMessage;
 
+  String? _pairingCode;
+  bool _isGeneratingCode = false;
+  bool _isLinkingPartner = false;
+
   @override
   void initState() {
     super.initState();
@@ -226,6 +230,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _generateCode() async {
+    setState(() => _isGeneratingCode = true);
+    final result = await _profileService.generateFamilyCode();
+    setState(() {
+      _isGeneratingCode = false;
+      if (result.isSuccess) {
+        _pairingCode = result.data;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.errorMessage ?? 'Kod oluşturulamadı')),
+        );
+      }
+    });
+  }
+
+  Future<void> _showLinkPartnerDialog() async {
+    final codeController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: context.colors.card,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(
+          'Eşleşme Kodu Girin',
+          style: TextStyle(color: context.colors.textPrimary),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Partnerinizin oluşturduğu 6 haneli kodu buraya girin.',
+              style: TextStyle(color: context.colors.textSecondary, fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: codeController,
+              decoration: InputDecoration(
+                hintText: '000000',
+                filled: true,
+                fillColor: context.colors.surface,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 8,
+              ),
+              keyboardType: TextInputType.number,
+              maxLength: 6,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('İptal', style: TextStyle(color: context.colors.textTertiary)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryPink,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: const Text('Eşleş', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && codeController.text.isNotEmpty) {
+      setState(() => _isLinkingPartner = true);
+      final result = await _profileService.linkPartner(codeController.text);
+      setState(() => _isLinkingPartner = false);
+      if (result.isSuccess) {
+        _refreshAll();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Eşleşme başarılı!')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(result.errorMessage ?? 'Eşleşme başarısız')),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
@@ -319,11 +417,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // Pregnancy Info Card veya Oluştur Butonu
+            // Pregnancy Info Card veya Bilgilendirme
             if (pregnancy != null)
-              _buildPregnancyInfoCard(context, pregnancy, dateFormat)
+              _buildPregnancyInfoCard(context, pregnancy, dateFormat, profile.isFather)
+            else if (profile.isMother)
+              _buildCreatePregnancyCard(context)
             else
-              _buildCreatePregnancyCard(context),
+              _buildFatherNoPregnancyCard(context),
+
+            const SizedBox(height: 28),
+
+            // Section: Family Pairing
+            const SectionHeader(title: 'Aile Eşleşmesi'),
+
+            const SizedBox(height: 16),
+
+            _buildFamilyPairingCard(context, profile),
 
             const SizedBox(height: 28),
 
@@ -489,10 +598,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              const Text('🤰', style: TextStyle(fontSize: 20)),
+              Text(
+                profile.isFather ? '👨‍💼' : '🤰',
+                style: const TextStyle(fontSize: 20),
+              ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
+          Text(
+            profile.isFather ? 'Baba Hesabı' : 'Anne Hesabı',
+            style: TextStyle(
+              fontSize: 13,
+              color: colors.textTertiary,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 12),
           // Week info badge
           if (pregnancy != null)
             Container(
@@ -545,6 +666,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BuildContext context,
     PregnancyData pregnancy,
     DateFormat dateFormat,
+    bool isFather,
   ) {
     final colors = context.colors;
 
@@ -589,25 +711,212 @@ class _ProfileScreenState extends State<ProfileScreen> {
               iconColor: AppColors.primaryBlue,
             ),
           ],
-          // Edit Pregnancy Button
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: _editPregnancy,
-                icon: const FaIcon(FontAwesomeIcons.pen, size: 14),
-                label: const Text('Hamilelik Bilgisini Düzenle'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.primaryPurple,
-                  side: const BorderSide(color: AppColors.primaryPurple),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+          // Edit Pregnancy Button - Sadece anneler için
+          if (!isFather)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: _editPregnancy,
+                  icon: const FaIcon(FontAwesomeIcons.pen, size: 14),
+                  label: const Text('Hamilelik Bilgisini Düzenle'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primaryPurple,
+                    side: const BorderSide(color: AppColors.primaryPurple),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFamilyPairingCard(BuildContext context, UserProfileData profile) {
+    final colors = context.colors;
+
+    if (profile.hasPartner) {
+      final partnerName = profile.partnerInfo?['full_name'] ?? 'Partner';
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 20,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBlue.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: FaIcon(
+                  FontAwesomeIcons.userGroup,
+                  size: 20,
+                  color: AppColors.primaryBlue,
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    partnerName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: colors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Hesabınız partnerinizle eşleşti',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: colors.textTertiary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const FaIcon(
+              FontAwesomeIcons.checkCircle,
+              color: AppColors.green,
+              size: 20,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            profile.isMother 
+                ? 'Partnerinizi (Baba) hesabınıza bağlayın.' 
+                : 'Partnerinizin (Anne) hesabına bağlanın.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: colors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 20),
+          if (profile.isMother) ...[
+            if (_pairingCode == null)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: _isGeneratingCode ? null : _generateCode,
+                  icon: _isGeneratingCode 
+                      ? const SizedBox(
+                          width: 16, 
+                          height: 16, 
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                        )
+                      : const FaIcon(FontAwesomeIcons.key, size: 16),
+                  label: const Text('Eşleşme Kodu Oluştur'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryPink,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              )
+            else
+              Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppColors.primaryPink.withValues(alpha: 0.3)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Eşleşme Kodunuz',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _pairingCode!,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 4,
+                            color: AppColors.primaryPink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Bu kod 15 dakika geçerlidir.',
+                    style: TextStyle(fontSize: 12, color: colors.textTertiary),
+                  ),
+                  TextButton(
+                    onPressed: _generateCode,
+                    child: const Text('Yeni Kod Oluştur'),
+                  ),
+                ],
+              ),
+          ] else ...[
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _isLinkingPartner ? null : _showLinkPartnerDialog,
+                icon: _isLinkingPartner
+                    ? const SizedBox(
+                        width: 16, 
+                        height: 16, 
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                      )
+                    : const FaIcon(FontAwesomeIcons.link, size: 16),
+                label: const Text('Kodu Gir ve Bağlan'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -655,6 +964,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFatherNoPregnancyCard(BuildContext context) {
+    final colors = context.colors;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: colors.card,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.primaryBlue.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Center(
+              child: FaIcon(
+                FontAwesomeIcons.userGroup,
+                size: 28,
+                color: AppColors.primaryBlue,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Henüz Bilgi Yok',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: colors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Bebeğinizin gelişimini takip etmek için partnerinizin (Anne) hesabıyla eşleşme yapın.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: colors.textTertiary),
           ),
         ],
       ),

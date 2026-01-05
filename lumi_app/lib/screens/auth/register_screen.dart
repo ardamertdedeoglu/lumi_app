@@ -6,10 +6,7 @@ import '../../services/auth_service.dart';
 class RegisterScreen extends StatefulWidget {
   final VoidCallback onRegisterSuccess;
 
-  const RegisterScreen({
-    super.key,
-    required this.onRegisterSuccess,
-  });
+  const RegisterScreen({super.key, required this.onRegisterSuccess});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -27,6 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  String _selectedRole = 'mother'; // 'mother' or 'father'
 
   @override
   void dispose() {
@@ -48,6 +46,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       lastName: _lastNameController.text.trim(),
       email: _emailController.text.trim(),
       password: _passwordController.text,
+      role: _selectedRole,
     );
 
     setState(() => _isLoading = false);
@@ -84,10 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: colors.textPrimary,
-          ),
+          icon: Icon(Icons.arrow_back_ios, color: colors.textPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -143,13 +139,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Text(
                   'Hamilelik yolculuğunuza başlayın',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: colors.textTertiary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: colors.textTertiary),
                 ),
 
                 const SizedBox(height: 32),
+
+                // Rol Seçimi
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildRoleCard(
+                        role: 'mother',
+                        title: 'Anne',
+                        icon: FontAwesomeIcons.personPregnant,
+                        isSelected: _selectedRole == 'mother',
+                        colors: colors,
+                        onTap: () => setState(() => _selectedRole = 'mother'),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildRoleCard(
+                        role: 'father',
+                        title: 'Baba',
+                        icon: FontAwesomeIcons.person,
+                        isSelected: _selectedRole == 'father',
+                        colors: colors,
+                        onTap: () => setState(() => _selectedRole = 'father'),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
 
                 // İsim ve Soyisim yan yana
                 Row(
@@ -199,7 +221,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'E-posta gerekli';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Geçerli bir e-posta girin';
                     }
                     return null;
@@ -222,7 +246,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: colors.textTertiary,
                       ),
                       onPressed: () {
@@ -278,11 +304,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                         color: colors.textTertiary,
                       ),
                       onPressed: () {
-                        setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                        setState(
+                          () => _obscureConfirmPassword =
+                              !_obscureConfirmPassword,
+                        );
                       },
                     ),
                     filled: true,
@@ -397,6 +428,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  Widget _buildRoleCard({
+    required String role,
+    required String title,
+    required IconData icon,
+    required bool isSelected,
+    required LumiColors colors,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primaryPink.withOpacity(0.1)
+              : colors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? AppColors.primaryPink : colors.borderLight,
+            width: 2,
+          ),
+        ),
+        child: Column(
+          children: [
+            FaIcon(
+              icon,
+              color: isSelected ? AppColors.primaryPink : colors.textTertiary,
+              size: 24,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: TextStyle(
+                color: isSelected ? AppColors.primaryPink : colors.textPrimary,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -425,10 +500,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(
-            color: AppColors.primaryPink,
-            width: 2,
-          ),
+          borderSide: const BorderSide(color: AppColors.primaryPink, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

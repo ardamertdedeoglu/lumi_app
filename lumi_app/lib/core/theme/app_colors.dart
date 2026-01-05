@@ -19,6 +19,12 @@ class AppColors {
     colors: [primaryPink, primaryPurple],
   );
 
+  static const LinearGradient blueGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primaryBlue, Color(0xFF0284C7)],
+  );
+
   // ============ LIGHT THEME COLORS ============
   static const Color lightBackground = Color(0xFFF8FAFC);
   static const Color lightCardWhite = Colors.white;

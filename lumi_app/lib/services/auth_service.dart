@@ -5,18 +5,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AuthService {
   // Backend URL - Duruma göre ayarlayın:
   // Android emulator için: 10.0.2.2
-  // iOS simulator için: localhost  
+  // iOS simulator için: localhost
   // Windows'ta Chrome/Edge için: localhost
   // Gerçek cihaz için: Bilgisayarın yerel IP'si (örn: 192.168.1.x)
-  // 
+  //
   // IP adresinizi bulmak için: Windows'ta cmd'de "ipconfig" yazın
   // "IPv4 Address" satırındaki adresi kullanın
-  static const String baseUrl = 'https://lumiappbackend-production.up.railway.app/api';
-  
+  static const String baseUrl =
+      'https://lumiappbackend-production.up.railway.app/api';
+
   // Alternatif URL'ler (test için):
   // static const String baseUrl = 'http://localhost:80/api';  // Web/Windows için
   // static const String baseUrl = 'http://192.168.1.X:80/api'; // Gerçek cihaz için
-  
+
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userDataKey = 'user_data';
@@ -83,10 +84,7 @@ class AuthService {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login/'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       final data = jsonDecode(response.body);
@@ -117,6 +115,7 @@ class AuthService {
     required String lastName,
     required String email,
     required String password,
+    String role = 'mother',
   }) async {
     try {
       final response = await http.post(
@@ -128,16 +127,18 @@ class AuthService {
           'email': email,
           'password1': password,
           'password2': password,
+          'role': role,
         }),
       );
 
       // HTML yanıtı kontrolü (sunucu hatası)
-      if (response.body.trim().startsWith('<!DOCTYPE') || 
+      if (response.body.trim().startsWith('<!DOCTYPE') ||
           response.body.trim().startsWith('<html') ||
           response.body.trim().startsWith('<HTML')) {
         return AuthResult(
-          success: false, 
-          message: 'Sunucu hatası (${response.statusCode}). Backend çalışıyor mu kontrol edin.',
+          success: false,
+          message:
+              'Sunucu hatası (${response.statusCode}). Backend çalışıyor mu kontrol edin.',
         );
       }
 

@@ -39,6 +39,7 @@ class AppStrings {
   static const String movements = 'Hareketler';
   static const String thisWeekMilestones = 'Bu Hafta Neler Oluyor?';
   static const String tipsForMom = 'Anneye Öneriler';
+  static const String tipsForDad = 'Babaya Öneriler';
   static const String weekNumber = 'Hafta';
   static const String sizeComparison = 'büyüklüğünde';
 

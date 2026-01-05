@@ -154,13 +154,21 @@ class BabyScreen extends StatelessWidget {
 
                 const SizedBox(height: 28),
 
-                // Section: Tips for Mom
-                const SectionHeader(title: AppStrings.tipsForMom),
+                // Section: Tips for Mom/Dad
+                SectionHeader(
+                  title: appState.profile?.isFather == true 
+                      ? AppStrings.tipsForDad 
+                      : AppStrings.tipsForMom
+                ),
 
                 const SizedBox(height: 16),
 
                 // Tips Card
-                TipsCard(tips: development.tips),
+                TipsCard(
+                  tips: appState.profile?.isFather == true 
+                      ? development.fatherTips 
+                      : development.tips
+                ),
 
                 const SizedBox(height: 28),
 
@@ -178,6 +186,8 @@ class BabyScreen extends StatelessWidget {
 
   Widget _buildNoPregnancyState(BuildContext context) {
     final colors = context.colors;
+    final appState = Provider.of<AppState>(context, listen: false);
+    final isFather = appState.profile?.isFather ?? false;
 
     return Center(
       child: Padding(
@@ -189,14 +199,15 @@ class BabyScreen extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: AppColors.primaryPink.withValues(alpha: 0.1),
+                color: (isFather ? AppColors.primaryBlue : AppColors.primaryPink)
+                    .withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Center(
+              child: Center(
                 child: FaIcon(
-                  FontAwesomeIcons.baby,
+                  isFather ? FontAwesomeIcons.userGroup : FontAwesomeIcons.baby,
                   size: 48,
-                  color: AppColors.primaryPink,
+                  color: isFather ? AppColors.primaryBlue : AppColors.primaryPink,
                 ),
               ),
             ),
@@ -211,7 +222,9 @@ class BabyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Bebeğinizin haftalık gelişimini takip etmek için profilinizden hamilelik bilgilerinizi girin.',
+              isFather
+                  ? 'Bebeğinizin haftalık gelişimini takip etmek için partnerinizin (Anne) hesabıyla eşleşme yapın.'
+                  : 'Bebeğinizin haftalık gelişimini takip etmek için profilinizden hamilelik bilgilerinizi girin.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
@@ -224,17 +237,18 @@ class BabyScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: isFather ? AppColors.blueGradient : AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: ElevatedButton.icon(
                 onPressed: () {
-                  // Profil sayfasına yönlendir - bu main.dart'tan nav index ile yapılacak
-                  // Şimdilik kullanıcıya bilgi ver
+                  // Profil sayfasına yönlendir
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text(
-                        'Profil sekmesinden hamilelik bilgilerinizi girebilirsiniz',
+                      content: Text(
+                        isFather
+                            ? 'Profil sekmesinden eşleşme yapabilirsiniz'
+                            : 'Profil sekmesinden hamilelik bilgilerinizi girebilirsiniz',
                       ),
                       backgroundColor: colors.textPrimary,
                       behavior: SnackBarBehavior.floating,
