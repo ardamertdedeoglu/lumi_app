@@ -133,10 +133,12 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: _currentIndex);
     // Ekran yüklendiğinde AppState'i initialize et
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appState = Provider.of<AppState>(context, listen: false);
@@ -146,7 +148,21 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   void _onNavTap(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _onPageChanged(int index) {
     setState(() {
       _currentIndex = index;
     });
@@ -160,8 +176,10 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: colors.background,
       body: SafeArea(
         bottom: false,
-        child: IndexedStack(
-          index: _currentIndex,
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: _onPageChanged,
+          physics: const BouncingScrollPhysics(),
           children: [
             const HomeScreen(),
             const BabyScreen(),
