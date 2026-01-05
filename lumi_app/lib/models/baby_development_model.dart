@@ -8,6 +8,7 @@ class BabyDevelopmentModel {
   final String movements;
   final List<String> milestones;
   final List<String> tips;
+  final List<String> fatherTips;
 
   const BabyDevelopmentModel({
     required this.week,
@@ -19,6 +20,7 @@ class BabyDevelopmentModel {
     required this.movements,
     required this.milestones,
     required this.tips,
+    this.fatherTips = const [],
   });
 
   // Demo data for week 16
@@ -42,6 +44,12 @@ class BabyDevelopmentModel {
       'Günde en az 8 bardak su için',
       'Hafif egzersizler yapın (yürüyüş, yüzme)',
       'Demir açısından zengin gıdalar tüketin',
+    ],
+    fatherTips: [
+      'Eşinizin doktor randevularına katılın',
+      'Ev işlerinde daha fazla sorumluluk alın',
+      'Bebeğinizle konuşmaya başlayın - sesinizi duyabilir',
+      'Eşinize masaj yaparak rahatlamasına yardımcı olun',
     ],
   );
 
@@ -91,6 +99,12 @@ class BabyDevelopmentModel {
         'Sigara ve alkolden uzak durun',
         'Doktorunuzla ilk randevunuzu planlayın',
       ],
+      fatherTips: [
+        'Eşinizin hamileliğini öğrendiğinizde duygusal destek olun',
+        'Siz de sigara ve alkolü bırakın veya azaltın',
+        'Hamilelik hakkında bilgi edinmeye başlayın',
+        'Eşinizle birlikte doktora gitmeyi planlayın',
+      ],
     ),
     5: const BabyDevelopmentModel(
       week: 5,
@@ -109,6 +123,12 @@ class BabyDevelopmentModel {
         'Sabah bulantısı normal, küçük öğünler yiyin',
         'Bol su için',
         'Yorgunluk normal, dinlenin',
+      ],
+      fatherTips: [
+        'Eşiniz bulantı yaşadığında yanında olun',
+        'Mutfakta yemek hazırlamaya yardım edin',
+        'Sabahları çay veya kraker getirin',
+        'Evdeki güçlü kokuları azaltın',
       ],
     ),
     6: const BabyDevelopmentModel(
@@ -129,6 +149,12 @@ class BabyDevelopmentModel {
         'İlk ultrason için hazırlanın',
         'Vitamin takviyelerinizi düzenli alın',
       ],
+      fatherTips: [
+        'İlk ultrason randevusuna eşinizle birlikte gidin',
+        'Eşinizin ihtiyaçlarına karşı duyarlı olun',
+        'Hamilelik takip uygulamasını birlikte kullanın',
+        'Eşinizin duygusal değişimlerine sabırlı olun',
+      ],
     ),
     7: const BabyDevelopmentModel(
       week: 7,
@@ -147,6 +173,12 @@ class BabyDevelopmentModel {
         'Protein alımınızı artırın',
         'Rahat giysiler tercih edin',
         'Duygusal değişimler normaldir',
+      ],
+      fatherTips: [
+        'Eşinize rahat kıyafetler almayı teklif edin',
+        'Akşam yürüyüşlerine birlikte çıkın',
+        'Duygusal anlarında dinleyici olun',
+        'Ev temizliğinde daha aktif rol alın',
       ],
     ),
     8: const BabyDevelopmentModel(
@@ -168,6 +200,12 @@ class BabyDevelopmentModel {
         'Bol meyve ve sebze tüketin',
         'Düzenli uyku rutini oluşturun',
       ],
+      fatherTips: [
+        'Market alışverişini üstlenin',
+        'Eşinizin dinlenmesine yardımcı olun',
+        'Bebek için isim araştırmaya başlayın',
+        'Hamilelik kitapları okuyun',
+      ],
     ),
     9: const BabyDevelopmentModel(
       week: 9,
@@ -186,6 +224,12 @@ class BabyDevelopmentModel {
         'İlk trimester taramalarını planlayın',
         'Stres yönetimi önemli',
         'Hafif yürüyüşler yapın',
+      ],
+      fatherTips: [
+        'Stresli ortamlardan eşinizi uzak tutun',
+        'Birlikte rahatlatıcı aktiviteler yapın',
+        'İlk trimester taramalarına birlikte gidin',
+        'Eşinizin beslenmesine dikkat edin',
       ],
     ),
     10: const BabyDevelopmentModel(
@@ -206,6 +250,12 @@ class BabyDevelopmentModel {
         'Göğüsleriniz hassaslaşabilir',
         'Dengeli beslenmeye devam edin',
       ],
+      fatherTips: [
+        'Kan tahlili sonuçlarını birlikte değerlendirin',
+        'Sağlıklı atıştırmalıklar hazırlayın',
+        'Eşinizin yorgunluğuna anlayış gösterin',
+        'Evdeki işleri paylaşın',
+      ],
     ),
     11: const BabyDevelopmentModel(
       week: 11,
@@ -224,6 +274,12 @@ class BabyDevelopmentModel {
         'Ense kalınlığı ölçümü için hazırlanın',
         'Kabızlık sorunu için lifli gıdalar tüketin',
         'Cilt değişimleri başlayabilir',
+      ],
+      fatherTips: [
+        'Ense kalınlığı testine eşinizle gidin',
+        'Lifli yiyeceklerle yemek hazırlayın',
+        'Eşinizin cildine özel ürünler alın',
+        'Bebeğin cinsiyetini öğrenmek isteyip istemediğinizi konuşun',
       ],
     ),
     12: const BabyDevelopmentModel(
@@ -245,6 +301,12 @@ class BabyDevelopmentModel {
         'Kafein tüketimini sınırlayın',
         '1. trimester sona eriyor, düşük riski azalıyor',
       ],
+      fatherTips: [
+        'İlk trimesterin bitişini kutlayın',
+        'Hamilelik haberini paylaşmayı planlayın',
+        'Bebek odası için fikirler araştırın',
+        'Eşinizin vitamin almasını hatırlatın',
+      ],
     ),
     13: const BabyDevelopmentModel(
       week: 13,
@@ -263,6 +325,12 @@ class BabyDevelopmentModel {
         '2. trimester başladı - enerji artabilir',
         'Hamilelere özel egzersiz sınıflarına bakın',
         'Beslenme danışmanından destek alın',
+      ],
+      fatherTips: [
+        'Eşinizin enerjisi arttıkça birlikte aktiviteler planlayın',
+        'Hamile yogası veya pilates kurslarını araştırın',
+        'Doğum hazırlık kurslarına bakın',
+        'Babalar için hamilelik gruplarına katılın',
       ],
     ),
     14: const BabyDevelopmentModel(
@@ -283,6 +351,12 @@ class BabyDevelopmentModel {
         'Pelvik taban egzersizlerine başlayın',
         'Hamilelik yogası deneyin',
       ],
+      fatherTips: [
+        'Proteinli yemekler hazırlamayı öğrenin',
+        'Eşinizle birlikte egzersiz yapın',
+        'Bebek eşyaları hakkında araştırma yapın',
+        'Mali planlamaya başlayın',
+      ],
     ),
     15: const BabyDevelopmentModel(
       week: 15,
@@ -301,6 +375,12 @@ class BabyDevelopmentModel {
         'Kalsiyum alımını artırın',
         'Burun kanaması ve diş eti kanaması olabilir',
         'Bol su için - idrar yolu enfeksiyonlarını önleyin',
+      ],
+      fatherTips: [
+        'Kalsiyumlu yiyecekler temin edin',
+        'Su içmeyi hatırlatın',
+        'Bebeğe kitap okumaya başlayın',
+        'Eşinizin uyku pozisyonuna yardımcı olun',
       ],
     ),
     16: demo,
@@ -322,6 +402,12 @@ class BabyDevelopmentModel {
         'Sol tarafınıza yatarak uyuyun',
         'Doğum hazırlık kurslarını araştırın',
       ],
+      fatherTips: [
+        'Bebek hareketlerini hissetmeye çalışın',
+        'Doğum hazırlık kurslarına birlikte kaydolun',
+        'Eşinizin uyku düzenine yardımcı olun',
+        'Hamilelik yastığı almayı düşünün',
+      ],
     ),
     18: const BabyDevelopmentModel(
       week: 18,
@@ -341,6 +427,12 @@ class BabyDevelopmentModel {
         'Sırt ağrıları için duruşunuza dikkat edin',
         'Bebek odası planlamasına başlayabilirsiniz',
       ],
+      fatherTips: [
+        'Cinsiyet öğrenme ultrasonuna katılın',
+        'Bebek odası için fikirler paylaşın',
+        'Eşinize sırt masajı yapın',
+        'Bebek eşyaları listesi oluşturun',
+      ],
     ),
     19: const BabyDevelopmentModel(
       week: 19,
@@ -359,6 +451,12 @@ class BabyDevelopmentModel {
         'Bacak kramplarına dikkat edin - magnezyum alın',
         'Gebelik çizgileri için nemlendirici kullanın',
         'Dengeli kilo alımına dikkat edin',
+      ],
+      fatherTips: [
+        'Bacak kramplarında masaj yapın',
+        'Magnezyum içeren yiyecekler temin edin',
+        'Karın nemlendirme rutininde yardımcı olun',
+        'Birlikte bebek alışverişine çıkın',
       ],
     ),
     20: const BabyDevelopmentModel(
@@ -381,6 +479,12 @@ class BabyDevelopmentModel {
         'Demir takviyesi alın',
         'Yarısına geldiniz, tebrikler!',
       ],
+      fatherTips: [
+        'Bebekle konuşun - sesinizi tanıyacak',
+        'Bebeğe müzik dinletin',
+        'Yarı yol kutlaması yapın',
+        'Detaylı ultrason görüntülerini saklayın',
+      ],
     ),
     21: const BabyDevelopmentModel(
       week: 21,
@@ -399,6 +503,12 @@ class BabyDevelopmentModel {
         'Bebeğinizin hareket düzenini öğrenin',
         'Hamilelere özel yastık kullanın',
         'Düzenli doktor kontrollerine devam edin',
+      ],
+      fatherTips: [
+        'Bebek tekmelerini hissedin ve sayın',
+        'Doktor randevularına eşlik edin',
+        'Bebek odası mobilyalarını araştırın',
+        'İş yerinden izin haklarınızı öğrenin',
       ],
     ),
     22: const BabyDevelopmentModel(
@@ -419,6 +529,12 @@ class BabyDevelopmentModel {
         'Şeker yüklemesi testi yaklaşıyor',
         'Doğum planı yapmaya başlayın',
       ],
+      fatherTips: [
+        'Doğum planını birlikte hazırlayın',
+        'Hastane seçeneklerini araştırın',
+        'Demir açısından zengin yemekler yapın',
+        'Bebek arabası ve koltuk araştırması yapın',
+      ],
     ),
     23: const BabyDevelopmentModel(
       week: 23,
@@ -437,6 +553,12 @@ class BabyDevelopmentModel {
         'Bebek hayatta kalma şansı artmaya başladı',
         'Sırt ve kalça ağrıları için egzersiz yapın',
         'Doğum öncesi kurslarına kaydolun',
+      ],
+      fatherTips: [
+        'Doğum öncesi kurslarına birlikte katılın',
+        'Bebeğin hıçkırıklarını hissedin',
+        'Eşinizin egzersiz yapmasına yardımcı olun',
+        'Acil durum planı yapın',
       ],
     ),
     24: const BabyDevelopmentModel(
@@ -458,6 +580,12 @@ class BabyDevelopmentModel {
         'Preeklampsi belirtilerini öğrenin',
         'Bebek alışverişi listesi yapın',
       ],
+      fatherTips: [
+        'Şeker testi sonuçlarını takip edin',
+        'Preeklampsi belirtilerini öğrenin',
+        'Bebek alışverişine başlayın',
+        'Doğum çantası için liste yapın',
+      ],
     ),
     25: const BabyDevelopmentModel(
       week: 25,
@@ -476,6 +604,12 @@ class BabyDevelopmentModel {
         '3. trimester yaklaşıyor',
         'Bebek eşyalarını hazırlamaya başlayın',
         'Hastane çantası listesi yapın',
+      ],
+      fatherTips: [
+        'Bebek eşyalarını birlikte hazırlayın',
+        'Hastane çantası listesi oluşturun',
+        'Bebek odasını düzenlemeye başlayın',
+        'Babalık izni prosedürlerini öğrenin',
       ],
     ),
     26: const BabyDevelopmentModel(
@@ -496,6 +630,12 @@ class BabyDevelopmentModel {
         'Gebelik diyabeti testi sonuçlarını değerlendirin',
         'Düzenli tekme sayımı yapın',
       ],
+      fatherTips: [
+        'Tekme sayımlarını birlikte yapın',
+        'Rh faktörü hakkında bilgi edinin',
+        'Bebek koltuğu takma pratiği yapın',
+        'Eşinizin dinlenmesini sağlayın',
+      ],
     ),
     27: const BabyDevelopmentModel(
       week: 27,
@@ -514,6 +654,12 @@ class BabyDevelopmentModel {
         '3. trimester başlıyor',
         'Erken doğum belirtilerini öğrenin',
         'Pelvik taban egzersizlerine devam edin',
+      ],
+      fatherTips: [
+        '3. trimester başlangıcını kutlayın',
+        'Erken doğum belirtilerini öğrenin',
+        'Hastaneye ulaşım planı yapın',
+        'Doğum sırasında ne yapacağınızı öğrenin',
       ],
     ),
     28: const BabyDevelopmentModel(
@@ -535,6 +681,12 @@ class BabyDevelopmentModel {
         'Doğum planınızı detaylandırın',
         'Bebek odası hazırlığına hız verin',
       ],
+      fatherTips: [
+        'Bebek odası montajını tamamlayın',
+        'Doğum planını birlikte gözden geçirin',
+        'Bebek bakımı eğitim videolarını izleyin',
+        'Hastane kayıt işlemlerini tamamlayın',
+      ],
     ),
     29: const BabyDevelopmentModel(
       week: 29,
@@ -553,6 +705,12 @@ class BabyDevelopmentModel {
         'Uyku pozisyonuna dikkat edin',
         'Nefes darlığı normal olabilir',
         'Hastane kayıt işlemlerini tamamlayın',
+      ],
+      fatherTips: [
+        'Eşinizin rahat uyumasına yardımcı olun',
+        'Gece ihtiyaçlarında destek olun',
+        'Bebek bakımı malzemelerini tamamlayın',
+        'Hastane yolunu öğrenin',
       ],
     ),
     30: const BabyDevelopmentModel(
@@ -573,6 +731,12 @@ class BabyDevelopmentModel {
         'Doğum partneri ile iletişimi güçlendirin',
         'Bebek bakımı hakkında bilgilenin',
       ],
+      fatherTips: [
+        'Hastane çantasını birlikte hazırlayın',
+        'Doğumda rolünüzü netleştirin',
+        'Bebek bezi değiştirme pratiği yapın',
+        'Emzirme desteği hakkında bilgi edinin',
+      ],
     ),
     31: const BabyDevelopmentModel(
       week: 31,
@@ -591,6 +755,12 @@ class BabyDevelopmentModel {
         'Braxton Hicks kasılmaları artabilir',
         'Bol dinlenin',
         'Doğum sonrası planlar yapın',
+      ],
+      fatherTips: [
+        'Braxton Hicks kasılmalarını tanıyın',
+        'Eşinizin dinlenmesini sağlayın',
+        'Doğum sonrası ev düzenini planlayın',
+        'Yeni doğan bakımı araştırması yapın',
       ],
     ),
     32: const BabyDevelopmentModel(
@@ -611,6 +781,12 @@ class BabyDevelopmentModel {
         'Bebek bakımı eğitimi alın',
         'Anne sütü hakkında bilgilenin',
       ],
+      fatherTips: [
+        'NST testlerine eşlik edin',
+        'Bebek bakımı kursuna birlikte katılın',
+        'Anne sütü saklama kapları alın',
+        'Bebeğin pozisyonunu takip edin',
+      ],
     ),
     33: const BabyDevelopmentModel(
       week: 33,
@@ -629,6 +805,12 @@ class BabyDevelopmentModel {
         'Doğum sancısı belirtilerini öğrenin',
         'Acil durum numaralarını hazırlayın',
         'Araba koltuğunu takın',
+      ],
+      fatherTips: [
+        'Araba koltuğunu takın ve kontrol ettirin',
+        'Acil numaraları telefonunuza kaydedin',
+        'Doğum sancısı belirtilerini öğrenin',
+        'Hastane çantasını arabaya koyun',
       ],
     ),
     34: const BabyDevelopmentModel(
@@ -649,6 +831,12 @@ class BabyDevelopmentModel {
         'Son kontrollerinizi aksatmayın',
         'Doğum çantanızı kontrol edin',
       ],
+      fatherTips: [
+        'Haftalık doktor kontrollerine eşlik edin',
+        'Doğum çantasını kontrol edin',
+        'Eşinizin rahatlaması için masaj yapın',
+        'Son hazırlıkları tamamlayın',
+      ],
     ),
     35: const BabyDevelopmentModel(
       week: 35,
@@ -667,6 +855,12 @@ class BabyDevelopmentModel {
         'Haftalık doktor kontrolü başlayabilir',
         'Doğum planını gözden geçirin',
         'Emzirme pozisyonlarını öğrenin',
+      ],
+      fatherTips: [
+        'Haftalık kontrollere katılın',
+        'Doğum planını son kez gözden geçirin',
+        'Emzirme desteği hakkında bilgilenin',
+        'Eşinizin ihtiyaçlarına hassas olun',
       ],
     ),
     36: const BabyDevelopmentModel(
@@ -687,6 +881,12 @@ class BabyDevelopmentModel {
         'Doğum belirtilerini yakından izleyin',
         'Bebek gereçlerini son kez kontrol edin',
       ],
+      fatherTips: [
+        'GBS testine eşlik edin',
+        'Doğum belirtilerini tanımayı öğrenin',
+        'Tüm bebek eşyalarını kontrol edin',
+        'Telefonunuzu her zaman açık tutun',
+      ],
     ),
     37: const BabyDevelopmentModel(
       week: 37,
@@ -705,6 +905,12 @@ class BabyDevelopmentModel {
         'Doğum her an gerçekleşebilir',
         'Su kesesinin açılmasına dikkat edin',
         'Sakin ve hazırlıklı olun',
+      ],
+      fatherTips: [
+        'Her an hazır olun - doğum yaklaştı',
+        'Su kesesi açılırsa ne yapacağınızı bilin',
+        'Eşinizi sakin tutmaya yardımcı olun',
+        'İş yerini bilgilendirin',
       ],
     ),
     38: const BabyDevelopmentModel(
@@ -725,6 +931,12 @@ class BabyDevelopmentModel {
         'Sık idrara çıkma normal',
         'Doğum sancısı ve yalancı sancı ayrımını bilin',
       ],
+      fatherTips: [
+        'Eşinizin rahat etmesine yardımcı olun',
+        'Gerçek ve yalancı sancı farkını öğrenin',
+        'Hastane çantası hazır olsun',
+        'Sakin kalın ve destek olun',
+      ],
     ),
     39: const BabyDevelopmentModel(
       week: 39,
@@ -743,6 +955,12 @@ class BabyDevelopmentModel {
         'Sıkışma hissi normal',
         'Nişane geldiğinde hastaneyi arayın',
         'Dinlenmeye çalışın',
+      ],
+      fatherTips: [
+        'Doğum sancıları başladığında sakin olun',
+        'Hastaneye gidiş zamanını bilin',
+        'Eşinize duygusal destek verin',
+        'Kontraksiyon sürelerini ölçün',
       ],
     ),
     40: const BabyDevelopmentModel(
@@ -764,6 +982,12 @@ class BabyDevelopmentModel {
         'Bebek hafta sonuna kadar gelmezse doktorunuzu arayın',
         'Sabırlı olun, bebek kendi zamanında gelecek',
         'Tebrikler, çok yakında annesiniz!',
+      ],
+      fatherTips: [
+        'Artık son gün! Hazır olun',
+        'Eşinize tam destek verin',
+        'Doğum sırasında yanında olun',
+        'Tebrikler, çok yakında babasınız!',
       ],
     ),
   };
