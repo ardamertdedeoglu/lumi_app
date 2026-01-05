@@ -81,36 +81,50 @@ class AppColors {
 /// Extension to get theme-aware colors
 class LumiColors {
   final BuildContext context;
-  
+
   LumiColors(this.context);
-  
+
   bool get isDark => Theme.of(context).brightness == Brightness.dark;
 
   // Background Colors
-  Color get background => isDark ? AppColors.darkBackground : AppColors.lightBackground;
+  Color get background =>
+      isDark ? AppColors.darkBackground : AppColors.lightBackground;
   Color get card => isDark ? AppColors.darkCardWhite : AppColors.lightCardWhite;
-  Color get surface => isDark ? AppColors.darkSurfaceLight : AppColors.lightSurfaceLight;
+  Color get surface =>
+      isDark ? AppColors.darkSurfaceLight : AppColors.lightSurfaceLight;
 
   // Text Colors
-  Color get textPrimary => isDark ? AppColors.darkTextDark : AppColors.lightTextDark;
-  Color get textSecondary => isDark ? AppColors.darkTextMedium : AppColors.lightTextMedium;
-  Color get textTertiary => isDark ? AppColors.darkTextLight : AppColors.lightTextLight;
-  Color get textMuted => isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
+  Color get textPrimary =>
+      isDark ? AppColors.darkTextDark : AppColors.lightTextDark;
+  Color get textSecondary =>
+      isDark ? AppColors.darkTextMedium : AppColors.lightTextMedium;
+  Color get textTertiary =>
+      isDark ? AppColors.darkTextLight : AppColors.lightTextLight;
+  Color get textMuted =>
+      isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
 
   // Border Colors
   Color get border => isDark ? AppColors.darkBorder : AppColors.lightBorder;
-  Color get borderMedium => isDark ? AppColors.darkBorderMedium : AppColors.lightBorderMedium;
-  Color get borderLight => isDark ? AppColors.darkBorderLight : AppColors.lightBorderLight;
+  Color get borderMedium =>
+      isDark ? AppColors.darkBorderMedium : AppColors.lightBorderMedium;
+  Color get borderLight =>
+      isDark ? AppColors.darkBorderLight : AppColors.lightBorderLight;
 
   // Card Icon Backgrounds
-  Color get pinkLight => isDark ? AppColors.darkPinkLight : AppColors.lightPinkLight;
-  Color get purpleLight => isDark ? AppColors.darkPurpleLight : AppColors.lightPurpleLight;
-  Color get blueLight => isDark ? AppColors.darkBlueLight : AppColors.lightBlueLight;
-  Color get redLight => isDark ? AppColors.darkRedLight : AppColors.lightRedLight;
-  Color get greenLight => isDark ? AppColors.darkGreenLight : AppColors.lightGreenLight;
+  Color get pinkLight =>
+      isDark ? AppColors.darkPinkLight : AppColors.lightPinkLight;
+  Color get purpleLight =>
+      isDark ? AppColors.darkPurpleLight : AppColors.lightPurpleLight;
+  Color get blueLight =>
+      isDark ? AppColors.darkBlueLight : AppColors.lightBlueLight;
+  Color get redLight =>
+      isDark ? AppColors.darkRedLight : AppColors.lightRedLight;
+  Color get greenLight =>
+      isDark ? AppColors.darkGreenLight : AppColors.lightGreenLight;
 
   // FAB Color
-  Color get fabBackground => isDark ? AppColors.darkDarkNavy : AppColors.lightDarkNavy;
+  Color get fabBackground =>
+      isDark ? AppColors.darkDarkNavy : AppColors.lightDarkNavy;
   Color get fabForeground => isDark ? AppColors.darkBackground : Colors.white;
 }
 

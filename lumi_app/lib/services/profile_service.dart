@@ -4,9 +4,9 @@ import 'auth_service.dart';
 
 class ProfileService {
   final AuthService _authService = AuthService();
-  
+
   String get baseUrl => AuthService.baseUrl;
-  
+
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
     if (_authService.accessToken != null)
@@ -35,7 +35,9 @@ class ProfileService {
         if (refreshed) {
           return getFullProfile(); // Retry with new token
         }
-        return ProfileResult.error('Oturum süresi doldu. Lütfen tekrar giriş yapın.');
+        return ProfileResult.error(
+          'Oturum süresi doldu. Lütfen tekrar giriş yapın.',
+        );
       } else {
         return ProfileResult.error('Profil bilgileri alınamadı');
       }
@@ -57,8 +59,10 @@ class ProfileService {
       if (firstName != null) body['first_name'] = firstName;
       if (lastName != null) body['last_name'] = lastName;
       if (phone != null) body['phone'] = phone;
-      if (birthDate != null) body['birth_date'] = birthDate.toIso8601String().split('T')[0];
-      if (notificationsEnabled != null) body['notifications_enabled'] = notificationsEnabled;
+      if (birthDate != null)
+        body['birth_date'] = birthDate.toIso8601String().split('T')[0];
+      if (notificationsEnabled != null)
+        body['notifications_enabled'] = notificationsEnabled;
 
       final response = await http.patch(
         Uri.parse('$baseUrl/profile/'),
@@ -108,7 +112,9 @@ class ProfileService {
         return ProfileResult.success(PregnancyData.fromJson(data));
       } else {
         final data = jsonDecode(response.body);
-        return ProfileResult.error(data['detail'] ?? 'Hamilelik bilgisi oluşturulamadı');
+        return ProfileResult.error(
+          data['detail'] ?? 'Hamilelik bilgisi oluşturulamadı',
+        );
       }
     } catch (e) {
       return ProfileResult.error('Bağlantı hatası: $e');
@@ -126,8 +132,14 @@ class ProfileService {
   }) async {
     try {
       final body = <String, dynamic>{};
-      if (lastPeriodDate != null) body['last_period_date'] = lastPeriodDate.toIso8601String().split('T')[0];
-      if (expectedDueDate != null) body['expected_due_date'] = expectedDueDate.toIso8601String().split('T')[0];
+      if (lastPeriodDate != null)
+        body['last_period_date'] = lastPeriodDate.toIso8601String().split(
+          'T',
+        )[0];
+      if (expectedDueDate != null)
+        body['expected_due_date'] = expectedDueDate.toIso8601String().split(
+          'T',
+        )[0];
       if (doctorName != null) body['doctor_name'] = doctorName;
       if (hospitalName != null) body['hospital_name'] = hospitalName;
       if (bloodType != null) body['blood_type'] = bloodType;
@@ -144,7 +156,9 @@ class ProfileService {
         return ProfileResult.success(PregnancyData.fromJson(data));
       } else {
         final data = jsonDecode(response.body);
-        return ProfileResult.error(data['detail'] ?? 'Hamilelik bilgisi güncellenemedi');
+        return ProfileResult.error(
+          data['detail'] ?? 'Hamilelik bilgisi güncellenemedi',
+        );
       }
     } catch (e) {
       return ProfileResult.error('Bağlantı hatası: $e');
@@ -218,8 +232,10 @@ class ProfileResult<T> {
 
   ProfileResult._({required this.isSuccess, this.data, this.errorMessage});
 
-  factory ProfileResult.success(T? data) => ProfileResult._(isSuccess: true, data: data);
-  factory ProfileResult.error(String message) => ProfileResult._(isSuccess: false, errorMessage: message);
+  factory ProfileResult.success(T? data) =>
+      ProfileResult._(isSuccess: true, data: data);
+  factory ProfileResult.error(String message) =>
+      ProfileResult._(isSuccess: false, errorMessage: message);
 }
 
 /// Tam profil verisi
@@ -232,8 +248,8 @@ class FullProfile {
   factory FullProfile.fromJson(Map<String, dynamic> json) {
     return FullProfile(
       profile: UserProfileData.fromJson(json['profile']),
-      pregnancy: json['pregnancy'] != null 
-          ? PregnancyData.fromJson(json['pregnancy']) 
+      pregnancy: json['pregnancy'] != null
+          ? PregnancyData.fromJson(json['pregnancy'])
           : null,
     );
   }
@@ -280,8 +296,8 @@ class UserProfileData {
       fullName: json['full_name'],
       role: json['role'] ?? 'mother',
       phone: json['phone'],
-      birthDate: json['birth_date'] != null 
-          ? DateTime.parse(json['birth_date']) 
+      birthDate: json['birth_date'] != null
+          ? DateTime.parse(json['birth_date'])
           : null,
       profileImage: json['profile_image'],
       notificationsEnabled: json['notifications_enabled'] ?? true,

@@ -156,18 +156,18 @@ class BabyScreen extends StatelessWidget {
 
                 // Section: Tips for Mom/Dad
                 SectionHeader(
-                  title: appState.profile?.isFather == true 
-                      ? AppStrings.tipsForDad 
-                      : AppStrings.tipsForMom
+                  title: appState.profile?.isFather == true
+                      ? AppStrings.tipsForDad
+                      : AppStrings.tipsForMom,
                 ),
 
                 const SizedBox(height: 16),
 
                 // Tips Card
                 TipsCard(
-                  tips: appState.profile?.isFather == true 
-                      ? development.fatherTips 
-                      : development.tips
+                  tips: appState.profile?.isFather == true
+                      ? development.fatherTips
+                      : development.tips,
                 ),
 
                 const SizedBox(height: 28),
@@ -199,15 +199,18 @@ class BabyScreen extends StatelessWidget {
               width: 100,
               height: 100,
               decoration: BoxDecoration(
-                color: (isFather ? AppColors.primaryBlue : AppColors.primaryPink)
-                    .withValues(alpha: 0.1),
+                color:
+                    (isFather ? AppColors.primaryBlue : AppColors.primaryPink)
+                        .withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: FaIcon(
                   isFather ? FontAwesomeIcons.userGroup : FontAwesomeIcons.baby,
                   size: 48,
-                  color: isFather ? AppColors.primaryBlue : AppColors.primaryPink,
+                  color: isFather
+                      ? AppColors.primaryBlue
+                      : AppColors.primaryPink,
                 ),
               ),
             ),
@@ -237,7 +240,9 @@ class BabyScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               decoration: BoxDecoration(
-                gradient: isFather ? AppColors.blueGradient : AppColors.primaryGradient,
+                gradient: isFather
+                    ? AppColors.blueGradient
+                    : AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: ElevatedButton.icon(

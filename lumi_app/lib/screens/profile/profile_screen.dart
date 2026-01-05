@@ -261,7 +261,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               'Partnerinizin oluşturduğu 6 haneli kodu buraya girin.',
-              style: TextStyle(color: context.colors.textSecondary, fontSize: 14),
+              style: TextStyle(
+                color: context.colors.textSecondary,
+                fontSize: 14,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -289,13 +292,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('İptal', style: TextStyle(color: context.colors.textTertiary)),
+            child: Text(
+              'İptal',
+              style: TextStyle(color: context.colors.textTertiary),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryPink,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
             child: const Text('Eşleş', style: TextStyle(color: Colors.white)),
           ),
@@ -310,9 +318,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (result.isSuccess) {
         _refreshAll();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Eşleşme başarılı!')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Eşleşme başarılı!')));
         }
       } else {
         if (mounted) {
@@ -419,7 +427,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // Pregnancy Info Card veya Bilgilendirme
             if (pregnancy != null)
-              _buildPregnancyInfoCard(context, pregnancy, dateFormat, profile.isFather)
+              _buildPregnancyInfoCard(
+                context,
+                pregnancy,
+                dateFormat,
+                profile.isFather,
+              )
             else if (profile.isMother)
               _buildCreatePregnancyCard(context)
             else
@@ -736,7 +749,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildFamilyPairingCard(BuildContext context, UserProfileData profile) {
+  Widget _buildFamilyPairingCard(
+    BuildContext context,
+    UserProfileData profile,
+  ) {
     final colors = context.colors;
 
     if (profile.hasPartner) {
@@ -788,10 +804,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 4),
                   Text(
                     'Hesabınız partnerinizle eşleşti',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: colors.textTertiary,
-                    ),
+                    style: TextStyle(fontSize: 13, color: colors.textTertiary),
                   ),
                 ],
               ),
@@ -823,14 +836,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         children: [
           Text(
-            profile.isMother 
-                ? 'Partnerinizi (Baba) hesabınıza bağlayın.' 
+            profile.isMother
+                ? 'Partnerinizi (Baba) hesabınıza bağlayın.'
                 : 'Partnerinizin (Anne) hesabına bağlanın.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: colors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 14, color: colors.textSecondary),
           ),
           const SizedBox(height: 20),
           if (profile.isMother) ...[
@@ -839,11 +849,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: _isGeneratingCode ? null : _generateCode,
-                  icon: _isGeneratingCode 
+                  icon: _isGeneratingCode
                       ? const SizedBox(
-                          width: 16, 
-                          height: 16, 
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const FaIcon(FontAwesomeIcons.key, size: 16),
                   label: const Text('Eşleşme Kodu Oluştur'),
@@ -851,7 +864,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: AppColors.primaryPink,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               )
@@ -859,17 +874,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     decoration: BoxDecoration(
                       color: colors.surface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primaryPink.withValues(alpha: 0.3)),
+                      border: Border.all(
+                        color: AppColors.primaryPink.withValues(alpha: 0.3),
+                      ),
                     ),
                     child: Column(
                       children: [
                         const Text(
                           'Eşleşme Kodunuz',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
@@ -902,9 +925,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: _isLinkingPartner ? null : _showLinkPartnerDialog,
                 icon: _isLinkingPartner
                     ? const SizedBox(
-                        width: 16, 
-                        height: 16, 
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : const FaIcon(FontAwesomeIcons.link, size: 16),
                 label: const Text('Kodu Gir ve Bağlan'),
@@ -912,7 +938,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   backgroundColor: AppColors.primaryBlue,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
