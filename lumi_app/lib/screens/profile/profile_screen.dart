@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_strings.dart';
@@ -588,12 +589,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 color: colors.card,
                 shape: BoxShape.circle,
               ),
-              child: Center(
-                child: FaIcon(
-                  FontAwesomeIcons.user,
-                  size: 32,
-                  color: colors.textTertiary,
-                ),
+              child: ClipOval(
+                child: profile.profileImage != null
+                    ? CachedNetworkImage(
+                        imageUrl: profile.profileImage!,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primaryPink,
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: FaIcon(
+                            FontAwesomeIcons.user,
+                            size: 32,
+                            color: colors.textTertiary,
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: FaIcon(
+                          FontAwesomeIcons.user,
+                          size: 32,
+                          color: colors.textTertiary,
+                        ),
+                      ),
               ),
             ),
           ),

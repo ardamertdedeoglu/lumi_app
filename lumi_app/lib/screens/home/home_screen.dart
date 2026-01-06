@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_strings.dart';
@@ -67,6 +68,7 @@ class HomeScreen extends StatelessWidget {
                   userName,
                   themeProvider,
                   appState.profile?.isFather ?? false,
+                  appState.profile?.profileImage,
                 ),
 
                 const SizedBox(height: 24),
@@ -172,6 +174,7 @@ class HomeScreen extends StatelessWidget {
     String userName,
     ThemeProvider themeProvider,
     bool isFather,
+    String? profileImage,
   ) {
     final colors = context.colors;
 
@@ -258,12 +261,32 @@ class HomeScreen extends StatelessWidget {
                   color: colors.borderLight,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: FaIcon(
-                    FontAwesomeIcons.user,
-                    size: 20,
-                    color: colors.textTertiary,
-                  ),
+                child: ClipOval(
+                  child: profileImage != null
+                      ? CachedNetworkImage(
+                          imageUrl: profileImage,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primaryPink,
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Center(
+                            child: FaIcon(
+                              FontAwesomeIcons.user,
+                              size: 20,
+                              color: colors.textTertiary,
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: FaIcon(
+                            FontAwesomeIcons.user,
+                            size: 20,
+                            color: colors.textTertiary,
+                          ),
+                        ),
                 ),
               ),
             ],

@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Profil resmi çekmek için kameraya erişim izni gereklidir.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Galeriden profil resmi seçmek için galeriye erişim izni gereklidir.</string>
 </dict>
 </plist>

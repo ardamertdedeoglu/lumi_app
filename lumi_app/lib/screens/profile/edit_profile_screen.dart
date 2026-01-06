@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/theme/app_colors.dart';
 import '../../services/profile_service.dart';
 
@@ -27,14 +31,130 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _phoneController;
   DateTime? _birthDate;
   bool _isLoading = false;
+  final _picker = ImagePicker();
+  String? _profileImageUrl;
 
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(text: widget.profile.firstName);
+    _firstNameController = TextEditingController(
+      text: widget.profile.firstName,
+    );
     _lastNameController = TextEditingController(text: widget.profile.lastName);
     _phoneController = TextEditingController(text: widget.profile.phone ?? '');
     _birthDate = widget.profile.birthDate;
+    _profileImageUrl = widget.profile.profileImage;
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final colors = context.colors;
+
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          color: colors.card,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Profil Resmini Değiştir',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: colors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(
+                  Icons.photo_library,
+                  color: AppColors.primaryPink,
+                ),
+                title: Text(
+                  'Galeriden Seç',
+                  style: TextStyle(color: colors.textPrimary),
+                ),
+                onTap: () => Navigator.pop(context, ImageSource.gallery),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.camera_alt,
+                  color: AppColors.primaryPink,
+                ),
+                title: Text(
+                  'Kamera ile Çek',
+                  style: TextStyle(color: colors.textPrimary),
+                ),
+                onTap: () => Navigator.pop(context, ImageSource.camera),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    final pickedFile = await _picker.pickImage(
+      source: source,
+      imageQuality: 70,
+    );
+
+    if (pickedFile == null) return;
+
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: pickedFile.path,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Resmi Kırp',
+          toolbarColor: AppColors.primaryPink,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+        ),
+        IOSUiSettings(title: 'Resmi Kırp', aspectRatioLockEnabled: true),
+      ],
+    );
+
+    if (croppedFile == null) return;
+
+    setState(() => _isLoading = true);
+
+    final result = await _profileService.uploadProfileImage(
+      File(croppedFile.path),
+    );
+
+    setState(() => _isLoading = false);
+
+    if (result.isSuccess) {
+      setState(() {
+        _profileImageUrl = result.data?.profileImage;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profil resmi güncellendi'),
+            backgroundColor: AppColors.green,
+          ),
+        );
+        widget.onSaved();
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result.errorMessage ?? 'Yükleme başarısız'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -66,8 +186,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final result = await _profileService.updateProfile(
       firstName: _firstNameController.text.trim(),
       lastName: _lastNameController.text.trim(),
-      phone: _phoneController.text.trim().isNotEmpty 
-          ? _phoneController.text.trim() 
+      phone: _phoneController.text.trim().isNotEmpty
+          ? _phoneController.text.trim()
           : null,
       birthDate: _birthDate,
     );
@@ -129,51 +249,84 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             children: [
               // Avatar
               Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 100,
-                      height: 100,
-                      padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
-                        gradient: AppColors.primaryGradient,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: colors.card,
+                child: GestureDetector(
+                  onTap: _isLoading ? null : _pickAndUploadImage,
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(
+                          gradient: AppColors.primaryGradient,
                           shape: BoxShape.circle,
                         ),
-                        child: Center(
-                          child: FaIcon(
-                            FontAwesomeIcons.user,
-                            size: 36,
-                            color: colors.textTertiary,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: colors.card,
+                            shape: BoxShape.circle,
+                          ),
+                          child: ClipOval(
+                            child: _profileImageUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: _profileImageUrl!,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primaryPink,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Center(
+                                          child: FaIcon(
+                                            FontAwesomeIcons.user,
+                                            size: 36,
+                                            color: colors.textTertiary,
+                                          ),
+                                        ),
+                                  )
+                                : Center(
+                                    child: FaIcon(
+                                      FontAwesomeIcons.user,
+                                      size: 36,
+                                      color: colors.textTertiary,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryPink,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: colors.card, width: 2),
-                        ),
-                        child: const Center(
-                          child: FaIcon(
-                            FontAwesomeIcons.camera,
-                            size: 14,
-                            color: Colors.white,
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: AppColors.primaryPink,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: colors.card, width: 2),
+                          ),
+                          child: Center(
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 14,
+                                    height: 14,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const FaIcon(
+                                    FontAwesomeIcons.camera,
+                                    size: 14,
+                                    color: Colors.white,
+                                  ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
@@ -273,24 +426,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _birthDate != null 
+                              _birthDate != null
                                   ? dateFormat.format(_birthDate!)
                                   : 'Seçilmedi',
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
-                                color: _birthDate != null 
-                                    ? colors.textPrimary 
+                                color: _birthDate != null
+                                    ? colors.textPrimary
                                     : colors.textMuted,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      Icon(
-                        Icons.chevron_right,
-                        color: colors.textTertiary,
-                      ),
+                      Icon(Icons.chevron_right, color: colors.textTertiary),
                     ],
                   ),
                 ),
@@ -348,13 +498,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildInfoRow(BuildContext context, {
+  Widget _buildInfoRow(
+    BuildContext context, {
     required String label,
     required String value,
     required IconData icon,
   }) {
     final colors = context.colors;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -371,11 +522,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: FaIcon(
-                icon,
-                size: 16,
-                color: AppColors.primaryBlue,
-              ),
+              child: FaIcon(icon, size: 16, color: AppColors.primaryBlue),
             ),
           ),
           const SizedBox(width: 14),
@@ -385,10 +532,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Text(
                   label,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: colors.textTertiary,
-                  ),
+                  style: TextStyle(fontSize: 13, color: colors.textTertiary),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -402,11 +546,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ],
             ),
           ),
-          FaIcon(
-            FontAwesomeIcons.lock,
-            size: 14,
-            color: colors.textMuted,
-          ),
+          FaIcon(FontAwesomeIcons.lock, size: 14, color: colors.textMuted),
         ],
       ),
     );

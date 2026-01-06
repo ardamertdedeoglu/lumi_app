@@ -2,7 +2,7 @@ name: lumi_app
 description: "Healthy Pregnancy Tracking App"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # Localization support
   flutter_localizations:
     sdk: flutter
@@ -38,22 +38,29 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  
+
   # Google Fonts for Inter font family
   google_fonts: ^6.2.1
-  
+
   # FontAwesome icons
   font_awesome_flutter: ^10.7.0
-  
+
   # State management
   provider: ^6.1.2
-  
+
+  # Image picking and cropping
+  image_picker: ^1.1.2
+  image_cropper: ^8.0.2
+
+  # Image caching
+  cached_network_image: ^3.4.1
+
   # Date formatting
   intl: ^0.20.2
-  
+
   # HTTP requests
   http: ^1.2.2
-  
+
   # Local storage for auth tokens
   shared_preferences: ^2.3.4
 
@@ -73,7 +80,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
