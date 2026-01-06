@@ -61,6 +61,8 @@ dependencies:
   # HTTP requests
   http: ^1.2.2
 
+  http_parser: ^4.1.2
+
   # Local storage for auth tokens
   shared_preferences: ^2.3.4
 
