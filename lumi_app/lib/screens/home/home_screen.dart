@@ -68,7 +68,7 @@ class HomeScreen extends StatelessWidget {
                   userName,
                   themeProvider,
                   appState.profile?.isFather ?? false,
-                  appState.profile?.profileImage,
+                  appState.profile?.fullProfileImageUrl,
                 ),
 
                 const SizedBox(height: 24),

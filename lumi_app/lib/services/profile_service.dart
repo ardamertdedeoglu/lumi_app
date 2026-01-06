@@ -337,6 +337,14 @@ class UserProfileData {
     this.partnerInfo,
   });
 
+  String? get fullProfileImageUrl {
+    if (profileImage == null) return null;
+    if (profileImage!.startsWith('http')) return profileImage;
+    // Eğer relative path ise baseUrl ekle (başına / ekleyerek)
+    final path = profileImage!.startsWith('/') ? profileImage : '/$profileImage';
+    return '${AuthService.baseUrl}$path';
+  }
+
   factory UserProfileData.fromJson(Map<String, dynamic> json) {
     return UserProfileData(
       id: json['id'],

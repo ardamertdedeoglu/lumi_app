@@ -590,9 +590,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 shape: BoxShape.circle,
               ),
               child: ClipOval(
-                child: profile.profileImage != null
+                child: profile.fullProfileImageUrl != null
                     ? CachedNetworkImage(
-                        imageUrl: profile.profileImage!,
+                        imageUrl: profile.fullProfileImageUrl!,
                         fit: BoxFit.cover,
                         placeholder: (context, url) => const Center(
                           child: CircularProgressIndicator(

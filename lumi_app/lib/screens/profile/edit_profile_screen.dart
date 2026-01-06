@@ -43,7 +43,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _lastNameController = TextEditingController(text: widget.profile.lastName);
     _phoneController = TextEditingController(text: widget.profile.phone ?? '');
     _birthDate = widget.profile.birthDate;
-    _profileImageUrl = widget.profile.profileImage;
+    _profileImageUrl = widget.profile.fullProfileImageUrl;
   }
 
   Future<void> _pickAndUploadImage() async {
@@ -134,7 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (result.isSuccess) {
       setState(() {
-        _profileImageUrl = result.data?.profileImage;
+        _profileImageUrl = result.data?.fullProfileImageUrl;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
