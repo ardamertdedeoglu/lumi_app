@@ -59,10 +59,12 @@ class ProfileService {
       if (firstName != null) body['first_name'] = firstName;
       if (lastName != null) body['last_name'] = lastName;
       if (phone != null) body['phone'] = phone;
-      if (birthDate != null)
+      if (birthDate != null) {
         body['birth_date'] = birthDate.toIso8601String().split('T')[0];
-      if (notificationsEnabled != null)
+      }
+      if (notificationsEnabled != null) {
         body['notifications_enabled'] = notificationsEnabled;
+      }
 
       final response = await http.patch(
         Uri.parse('$baseUrl/profile/'),
@@ -132,14 +134,16 @@ class ProfileService {
   }) async {
     try {
       final body = <String, dynamic>{};
-      if (lastPeriodDate != null)
+      if (lastPeriodDate != null) {
         body['last_period_date'] = lastPeriodDate.toIso8601String().split(
           'T',
         )[0];
-      if (expectedDueDate != null)
+      }
+      if (expectedDueDate != null) {
         body['expected_due_date'] = expectedDueDate.toIso8601String().split(
           'T',
         )[0];
+      }
       if (doctorName != null) body['doctor_name'] = doctorName;
       if (hospitalName != null) body['hospital_name'] = hospitalName;
       if (bloodType != null) body['blood_type'] = bloodType;

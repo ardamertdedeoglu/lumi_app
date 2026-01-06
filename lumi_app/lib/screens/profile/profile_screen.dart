@@ -810,7 +810,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const FaIcon(
-              FontAwesomeIcons.checkCircle,
+              FontAwesomeIcons.circleCheck,
               color: AppColors.green,
               size: 20,
             ),

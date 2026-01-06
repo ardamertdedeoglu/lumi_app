@@ -443,7 +443,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primaryPink.withOpacity(0.1)
+              ? AppColors.primaryPink.withValues(alpha: 0.1)
               : colors.card,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
