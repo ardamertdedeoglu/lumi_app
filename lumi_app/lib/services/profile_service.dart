@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'auth_service.dart';
 
 class ProfileService {
@@ -40,6 +42,50 @@ class ProfileService {
         );
       } else {
         return ProfileResult.error('Profil bilgileri alınamadı');
+      }
+    } catch (e) {
+      return ProfileResult.error('Bağlantı hatası: $e');
+    }
+  }
+
+  /// Profil resmi yükle
+  Future<ProfileResult<UserProfileData>> uploadProfileImage(
+    File imageFile,
+  ) async {
+    try {
+      final request = http.MultipartRequest(
+        'PATCH',
+        Uri.parse('$baseUrl/profile/'),
+      );
+
+      request.headers.addAll({
+        if (_authService.accessToken != null)
+          'Authorization': 'Bearer ${_authService.accessToken}',
+      });
+
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'profile_image',
+          imageFile.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return ProfileResult.success(UserProfileData.fromJson(data));
+      } else if (response.statusCode == 401) {
+        final refreshed = await _authService.refreshAccessToken();
+        if (refreshed) {
+          return uploadProfileImage(imageFile);
+        }
+        return ProfileResult.error('Oturum süresi doldu.');
+      } else {
+        final data = jsonDecode(response.body);
+        return ProfileResult.error(data['detail'] ?? 'Resim yüklenemedi');
       }
     } catch (e) {
       return ProfileResult.error('Bağlantı hatası: $e');
