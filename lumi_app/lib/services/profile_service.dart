@@ -77,7 +77,7 @@ class ProfileService {
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
-      
+
       // Debug için response body'yi yazdır
       print('Upload response status: ${response.statusCode}');
       print('Upload response body: ${response.body}');
@@ -94,9 +94,13 @@ class ProfileService {
       } else {
         try {
           final data = jsonDecode(response.body);
-          return ProfileResult.error(data['detail'] ?? 'Resim yüklenemedi: ${response.statusCode}');
+          return ProfileResult.error(
+            data['detail'] ?? 'Resim yüklenemedi: ${response.statusCode}',
+          );
         } catch (e) {
-          return ProfileResult.error('Resim yüklenemedi: ${response.statusCode} - ${response.body}');
+          return ProfileResult.error(
+            'Resim yüklenemedi: ${response.statusCode} - ${response.body}',
+          );
         }
       }
     } catch (e) {
