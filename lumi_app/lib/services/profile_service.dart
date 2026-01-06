@@ -341,7 +341,9 @@ class UserProfileData {
     if (profileImage == null) return null;
     if (profileImage!.startsWith('http')) return profileImage;
     // Eğer relative path ise baseUrl ekle (başına / ekleyerek)
-    final path = profileImage!.startsWith('/') ? profileImage : '/$profileImage';
+    final path = profileImage!.startsWith('/')
+        ? profileImage
+        : '/$profileImage';
     return '${AuthService.baseUrl}$path';
   }
 
