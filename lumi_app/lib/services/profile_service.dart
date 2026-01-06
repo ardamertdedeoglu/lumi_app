@@ -63,16 +63,24 @@ class ProfileService {
           'Authorization': 'Bearer ${_authService.accessToken}',
       });
 
+      // Dosya uzantısını belirle
+      final extension = imageFile.path.split('.').last.toLowerCase();
+      final mimeType = extension == 'png' ? 'png' : 'jpeg';
+
       request.files.add(
         await http.MultipartFile.fromPath(
           'profile_image',
           imageFile.path,
-          contentType: MediaType('image', 'jpeg'),
+          contentType: MediaType('image', mimeType),
         ),
       );
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
+      
+      // Debug için response body'yi yazdır
+      print('Upload response status: ${response.statusCode}');
+      print('Upload response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -84,10 +92,15 @@ class ProfileService {
         }
         return ProfileResult.error('Oturum süresi doldu.');
       } else {
-        final data = jsonDecode(response.body);
-        return ProfileResult.error(data['detail'] ?? 'Resim yüklenemedi');
+        try {
+          final data = jsonDecode(response.body);
+          return ProfileResult.error(data['detail'] ?? 'Resim yüklenemedi: ${response.statusCode}');
+        } catch (e) {
+          return ProfileResult.error('Resim yüklenemedi: ${response.statusCode} - ${response.body}');
+        }
       }
     } catch (e) {
+      print('Upload error: $e');
       return ProfileResult.error('Bağlantı hatası: $e');
     }
   }
