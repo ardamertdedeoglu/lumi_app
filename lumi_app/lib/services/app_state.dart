@@ -1,20 +1,20 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'profile_service.dart';
 import 'auth_service.dart';
+import 'plan_service.dart';
 
 /// Uygulama genelinde paylaşılan state - ChangeNotifier ile Provider'a bağlı
 class AppState extends ChangeNotifier {
   final ProfileService _profileService = ProfileService();
   final AuthService _authService = AuthService();
+  final PlanService _planService = PlanService();
 
   // State variables
   FullProfile? _fullProfile;
   bool _isLoading = false;
   bool _isInitialized = false;
   String? _errorMessage;
-  List<LocalPlan> _localPlans = [];
+  List<PlanData> _plans = [];
 
   // Getters
   FullProfile? get fullProfile => _fullProfile;
@@ -25,7 +25,7 @@ class AppState extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get hasData => _fullProfile != null;
   bool get hasPregnancy => _fullProfile?.pregnancy != null;
-  List<LocalPlan> get localPlans => _localPlans;
+  List<PlanData> get plans => _plans;
 
   /// Kullanıcı tam adını döndür
   String get userFullName {
@@ -50,11 +50,11 @@ class AppState extends ChangeNotifier {
   /// Doğuma kalan gün sayısını döndür
   int get daysUntilBirth => pregnancy?.daysUntilBirth ?? 0;
 
-  /// Bugünün planlarını getir
-  List<LocalPlan> get todayPlans {
+  /// Bugünün planlarını getir (API'den gelen verilerden filtrele)
+  List<PlanData> get todayPlans {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    return _localPlans.where((plan) {
+    return _plans.where((plan) {
       final planDate = DateTime(
         plan.scheduledTime.year,
         plan.scheduledTime.month,
@@ -71,11 +71,11 @@ class AppState extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    // Lokal planları yükle
-    await _loadLocalPlans();
-
     // Profil verilerini yükle
     await loadProfile();
+
+    // API'den planları yükle
+    await loadPlans();
 
     _isInitialized = true;
     _isLoading = false;
@@ -133,7 +133,7 @@ class AppState extends ChangeNotifier {
     _errorMessage = null;
     _isLoading = false;
     _isInitialized = false;
-    _localPlans = [];
+    _plans = [];
     notifyListeners();
   }
 
@@ -155,158 +155,148 @@ class AppState extends ChangeNotifier {
       _errorMessage = 'Veri yüklenirken hata oluştu: $e';
     }
 
+    // Planları da yenile
+    await loadPlans();
+
     _isLoading = false;
     notifyListeners();
   }
 
-  // ==================== LOKAL PLAN YÖNETİMİ ====================
+  // ==================== PLAN YÖNETİMİ (API) ====================
 
-  static const String _plansKey = 'local_plans';
-
-  /// Lokal planları SharedPreferences'dan yükle
-  Future<void> _loadLocalPlans() async {
+  /// API'den planları yükle
+  Future<void> loadPlans() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final plansJson = prefs.getString(_plansKey);
-      if (plansJson != null) {
-        final List<dynamic> plansList = jsonDecode(plansJson);
-        _localPlans = plansList.map((e) => LocalPlan.fromJson(e)).toList();
+      final result = await _planService.getTodayPlans();
+      if (result.isSuccess && result.data != null) {
+        _plans = result.data!;
+        notifyListeners();
       }
     } catch (e) {
       debugPrint('Planlar yüklenemedi: $e');
     }
   }
 
-  /// Lokal planları SharedPreferences'a kaydet
-  Future<void> _saveLocalPlans() async {
+  /// Tüm planları API'den yükle
+  Future<void> loadAllPlans() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final plansJson = jsonEncode(_localPlans.map((e) => e.toJson()).toList());
-      await prefs.setString(_plansKey, plansJson);
+      final result = await _planService.getAllPlans();
+      if (result.isSuccess && result.data != null) {
+        _plans = result.data!;
+        notifyListeners();
+      }
     } catch (e) {
-      debugPrint('Planlar kaydedilemedi: $e');
+      debugPrint('Planlar yüklenemedi: $e');
     }
   }
 
-  /// Yeni plan ekle
-  Future<void> addPlan({
+  /// Yeni plan ekle (API üzerinden)
+  Future<bool> addPlan({
     required String title,
     String? description,
     required DateTime scheduledTime,
     required String category,
   }) async {
-    final newPlan = LocalPlan(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: title,
-      description: description,
-      scheduledTime: scheduledTime,
-      category: category,
-      isCompleted: false,
-      createdAt: DateTime.now(),
-    );
+    try {
+      final result = await _planService.createPlan(
+        title: title,
+        description: description,
+        scheduledTime: scheduledTime,
+        category: PlanCategoryExtension.fromString(category),
+      );
 
-    _localPlans.add(newPlan);
-    await _saveLocalPlans();
-    notifyListeners();
+      if (result.isSuccess && result.data != null) {
+        _plans.add(result.data!);
+        _plans.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
+        notifyListeners();
+        return true;
+      } else {
+        debugPrint('Plan oluşturulamadı: ${result.errorMessage}');
+        return false;
+      }
+    } catch (e) {
+      debugPrint('Plan oluşturulurken hata: $e');
+      return false;
+    }
   }
 
   /// Plan durumunu değiştir (tamamlandı/tamamlanmadı)
-  Future<void> togglePlanCompletion(String planId) async {
-    final index = _localPlans.indexWhere((p) => p.id == planId);
+  Future<void> togglePlanCompletion(int planId) async {
+    final index = _plans.indexWhere((p) => p.id == planId);
     if (index != -1) {
-      _localPlans[index] = _localPlans[index].copyWith(
-        isCompleted: !_localPlans[index].isCompleted,
-      );
-      await _saveLocalPlans();
+      final plan = _plans[index];
+      final newStatus = !plan.isCompleted;
+
+      // Optimistic update
+      _plans[index] = plan.copyWith(isCompleted: newStatus);
       notifyListeners();
+
+      // API çağrısı
+      final result = await _planService.togglePlanCompletion(planId, newStatus);
+      if (!result.isSuccess) {
+        // Hata durumunda geri al
+        _plans[index] = plan;
+        notifyListeners();
+        debugPrint('Plan durumu güncellenemedi: ${result.errorMessage}');
+      }
     }
   }
 
-  /// Plan sil
-  Future<void> deletePlan(String planId) async {
-    _localPlans.removeWhere((p) => p.id == planId);
-    await _saveLocalPlans();
-    notifyListeners();
-  }
-
-  /// Plan güncelle
-  Future<void> updatePlan(LocalPlan updatedPlan) async {
-    final index = _localPlans.indexWhere((p) => p.id == updatedPlan.id);
+  /// Plan sil (API üzerinden)
+  Future<void> deletePlan(int planId) async {
+    final index = _plans.indexWhere((p) => p.id == planId);
     if (index != -1) {
-      _localPlans[index] = updatedPlan;
-      await _saveLocalPlans();
+      final removedPlan = _plans[index];
+
+      // Optimistic update
+      _plans.removeAt(index);
       notifyListeners();
+
+      // API çağrısı
+      final result = await _planService.deletePlan(planId);
+      if (!result.isSuccess) {
+        // Hata durumunda geri ekle
+        _plans.insert(index, removedPlan);
+        notifyListeners();
+        debugPrint('Plan silinemedi: ${result.errorMessage}');
+      }
     }
   }
-}
 
-/// Lokal plan modeli
-class LocalPlan {
-  final String id;
-  final String title;
-  final String? description;
-  final DateTime scheduledTime;
-  final String category;
-  final bool isCompleted;
-  final DateTime createdAt;
-
-  LocalPlan({
-    required this.id,
-    required this.title,
-    this.description,
-    required this.scheduledTime,
-    required this.category,
-    required this.isCompleted,
-    required this.createdAt,
-  });
-
-  factory LocalPlan.fromJson(Map<String, dynamic> json) {
-    return LocalPlan(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      scheduledTime: DateTime.parse(json['scheduled_time']),
-      category: json['category'] ?? 'other',
-      isCompleted: json['is_completed'] ?? false,
-      createdAt: DateTime.parse(json['created_at']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'description': description,
-      'scheduled_time': scheduledTime.toIso8601String(),
-      'category': category,
-      'is_completed': isCompleted,
-      'created_at': createdAt.toIso8601String(),
-    };
-  }
-
-  String get timeLabel {
-    final hour = scheduledTime.hour.toString().padLeft(2, '0');
-    final minute = scheduledTime.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-
-  LocalPlan copyWith({
-    String? id,
+  /// Plan güncelle (API üzerinden)
+  Future<bool> updatePlan({
+    required int planId,
     String? title,
     String? description,
     DateTime? scheduledTime,
     String? category,
     bool? isCompleted,
-    DateTime? createdAt,
-  }) {
-    return LocalPlan(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      scheduledTime: scheduledTime ?? this.scheduledTime,
-      category: category ?? this.category,
-      isCompleted: isCompleted ?? this.isCompleted,
-      createdAt: createdAt ?? this.createdAt,
-    );
+  }) async {
+    try {
+      final result = await _planService.updatePlan(
+        planId: planId,
+        title: title,
+        description: description,
+        scheduledTime: scheduledTime,
+        category: category != null
+            ? PlanCategoryExtension.fromString(category)
+            : null,
+        isCompleted: isCompleted,
+      );
+
+      if (result.isSuccess && result.data != null) {
+        final index = _plans.indexWhere((p) => p.id == planId);
+        if (index != -1) {
+          _plans[index] = result.data!;
+          _plans.sort((a, b) => a.scheduledTime.compareTo(b.scheduledTime));
+          notifyListeners();
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Plan güncellenirken hata: $e');
+      return false;
+    }
   }
 }

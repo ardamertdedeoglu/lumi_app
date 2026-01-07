@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/constants/app_strings.dart';
 import '../../services/app_state.dart';
+import '../../services/plan_service.dart';
 import '../../widgets/home/ai_insight_card.dart';
 import '../../widgets/home/status_card.dart';
 import '../../widgets/home/quick_action_button.dart';
@@ -296,7 +297,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTodaysPlanHeader(BuildContext context, List<LocalPlan> plans) {
+  Widget _buildTodaysPlanHeader(BuildContext context, List<PlanData> plans) {
     final colors = context.colors;
 
     return Padding(
@@ -341,7 +342,7 @@ class HomeScreen extends StatelessWidget {
   Widget _buildPlansList(
     BuildContext context,
     AppState appState,
-    List<LocalPlan> plans,
+    List<PlanData> plans,
   ) {
     final colors = context.colors;
 
@@ -451,13 +452,13 @@ class HomeScreen extends StatelessWidget {
   Widget _buildPlanCard(
     BuildContext context,
     AppState appState,
-    LocalPlan plan,
+    PlanData plan,
   ) {
     final colors = context.colors;
-    final categoryColor = _getCategoryColor(plan.category);
+    final categoryColor = _getCategoryColor(plan.category.name);
 
     return Dismissible(
-      key: Key(plan.id),
+      key: Key(plan.id.toString()),
       direction: DismissDirection.endToStart,
       background: Container(
         alignment: Alignment.centerRight,
