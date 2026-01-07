@@ -78,10 +78,6 @@ class ProfileService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
-      // Debug için response body'yi yazdır
-      print('Upload response status: ${response.statusCode}');
-      print('Upload response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return ProfileResult.success(UserProfileData.fromJson(data));
@@ -104,7 +100,6 @@ class ProfileService {
         }
       }
     } catch (e) {
-      print('Upload error: $e');
       return ProfileResult.error('Bağlantı hatası: $e');
     }
   }
